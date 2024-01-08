@@ -15,14 +15,17 @@
         />
       </div>
       <div class="sorting">
-        <button class="price">Price</button>
-        <button class="size">Size</button>
+        <button class="price" :style="{ backgroundColor: priceButtonColor }" @click="sortByPrice">Price</button>
+        <button class="size" :style="{ backgroundColor: sizeButtonColor }" @click="sortBySize">Size</button>
       </div>
     </div>
 
-    <div class="items-results">
-      <div v-for="house in housesData" :key="house.id" class="result-card">
-        <img class="image" alt="Result img" :src="house.image" >
+    <div v-if="filteredAndSortedHouses.length > 0" class="items-results">
+      <div v-for="house in filteredAndSortedHouses" :key="house.id" class="result-card" @click="navigateToHouseDetails(house.id)">
+        <div class="image">
+          <img alt="Result img" :src="house.image" >
+        </div>
+
         <div class="info">
           <p class="name">{{ house.location.street + ' ' + house.location.houseNumber }}</p>
           <p class="price">€ {{ convertNumberWithComma(house.price) }}</p>
@@ -42,24 +45,27 @@
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- <div v-if="searchResults.length > 0">
-        <ul>
-          <li v-for="result in searchResults" :key="result.id">
-            {{ result.name }}
-          </li>
-        </ul>
+        <div class="tools">
+          <div>
+            <button><img alt="Edit icon" src="@/assets/ic_edit@3x.png" ></button>
+            <button><img alt="delete icon" src="@/assets/ic_delete@3x.png" ></button>
+          </div>
+        </div>
       </div>
-      <div v-else>No results found. Please try another keyword.</div> -->
     </div>
+    <div v-else>No results found. Please try another keyword.</div>
+
   </div>
 </template>
 
 <script setup>
 import { useStore } from 'vuex';
-import { ref, onMounted  } from "vue";
+import { ref, onMounted, computed } from "vue";
+import { useRouter } from 'vue-router';
+import './SearchCss.css'
 
+const router = useRouter();
 const store = useStore();
 const housesData = ref([]);
 
@@ -73,139 +79,51 @@ const convertNumberWithComma = (x) => {
 }
 
 const searchQuery = ref("");
-// const searchResults = ref([]);
 
-// const search = () => {
-//   const data = [
-//     { id: 1, name: "Item 1" },
-//     { id: 2, name: "Item 2" },
-//     { id: 3, name: "Item 3" },
-//   ];
+const filteredAndSortedHouses = computed(() => {
+  const query = searchQuery.value.toLowerCase().trim();
+  if (!query) {
+    return housesData.value;
+  }
 
-//   searchResults.value = data.filter((item) =>
-//     item.name.toLowerCase().includes(searchQuery.value.toLowerCase())
-//   );
-// };
+  const filteredHouses = housesData.value.filter((house) => {
+    const searchString = `${house.location.street} ${house.location.houseNumber} ${house.price} ${house.location.zip} ${house.location.city}`.toLowerCase();
+    return searchString.includes(query);
+  });
+
+  return filteredHouses.sort((a, b) => {
+    return a.price - b.price;
+  });
+});
+// TODO OPTIMIZE THE SORTING LOGIC
+const sortingOptions = {
+  PRICE: 'price',
+  SIZE: 'size',
+};
+
+const currentSortingOption = ref(sortingOptions.PRICE);
+
+const priceButtonColor = computed(() => {
+  return currentSortingOption.value === sortingOptions.PRICE ? '#eb5440' : '#C3C3C3';
+});
+
+const sizeButtonColor = computed(() => {
+  return currentSortingOption.value === sortingOptions.SIZE ? '#eb5440' : '#C3C3C3';
+});
+
+const sortByPrice = () => {
+  filteredAndSortedHouses.value.sort((a, b) => a.price - b.price);
+  currentSortingOption.value = sortingOptions.PRICE;
+};
+
+const sortBySize = () => {
+  filteredAndSortedHouses.value.sort((a, b) => a.size - b.size);
+  currentSortingOption.value = sortingOptions.SIZE;
+};
+
+const navigateToHouseDetails = (houseId) => {
+  store.dispatch('setSelectedHouseId', houseId);
+  router.push({ name: 'HouseDetails'});
+};
+
 </script>
-
-<style>
-.result-card {
-  margin: 20px 0;
-  border-radius: 5px;
-  padding: 15px;
-  display: flex;
-  box-shadow: rgba(14, 30, 37, 0.12) -1px 2px 4px 0px, rgba(14, 30, 37, 0.12) 4px -3px 16px 0px;
-}
-.result-card .image {
-  border-radius: 5px;
-  height: 140px;
-  width: 180px;
-  margin-right: 20px;
-}
-.result-card .info {
-  display: flex;
-  flex-direction: column;
-  align-items: start;
-}
-.rooms {
-  display: flex;
-}
-.rooms div {
-  display: flex;
-  align-items: start;
-  margin-right: 10px;
-}
-.rooms img {
-  width: 22px;
-  height: 22px;
-  margin-right: 20px;
-}
-.rooms p {
-  margin-bottom: 0;
-}
-.info p {
-  font-size: 18px;
-  margin: 0 0 15px 0;
-}
-.info .name {
- font-weight: 700;
- color: #000000;
-}
-.info .price {
-  font-weight: 500;
-  color: #4A4B4C;
-}
-.info .address {
-  font-weight: 300;
-  color: #C3C3C3;
-}
-.search-container {
-  width: 100%;
-}
-.items-results {
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-}
-.search-container input {
-  width: 100%;
-  height: 36px;
-  padding-left: 55px;
-  border: 0;
-  background-color: #e8e8e8;
-  border-radius: 5px;
-}
-.input-container {
-  display: flex;
-  position: relative;
-  margin-bottom: 20px;
-}
-.search-container .search-icon {
-  width: 18px;
-  height: 18px;
-  margin: 0;
-  position: absolute;
-  top: 10px;
-  left: 20px;
-}
-.functions {
-  width: 100%;
-}
-.functions, .sorting {
-  display: flex;
-}
-.functions {
-  flex-direction: column;
-  
-}
-.functions button {
-  border: 0;
-  width: 50%;
-  color: #fff;
-  font-weight: 700;
-}
-.sorting .price {
-  background-color: #eb5440;
-}
-.size {
-  background-color: #C3C3C3;
-}
-.sorting {
-  width: 100%;
-  overflow: hidden;
-  border-radius: 5px;
-  height: 40px;
-}
-@media (min-width: 600px) {
-  .sorting {
-    width: 260px;
-  }
-  .search-container input {
-    width: 300px;
-  }
-  .functions {
-    flex-direction: row;
-    justify-content: space-between;
-  }
-}
-</style>
