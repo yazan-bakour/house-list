@@ -21,38 +21,7 @@
     </div>
 
     <div v-if="filteredAndSortedHouses.length > 0" class="items-results">
-      <div v-for="house in filteredAndSortedHouses" :key="house.id" class="result-card" @click="navigateToHouseDetails(house.id)">
-        <div class="image">
-          <img alt="Result img" :src="house.image" >
-        </div>
-
-        <div class="info">
-          <p class="name">{{ house.location.street + ' ' + house.location.houseNumber }}</p>
-          <p class="price">€ {{ convertNumberWithComma(house.price) }}</p>
-          <p class="address">{{ house.location.zip + ' ' + house.location.city }}</p>
-          <div class="rooms">
-            <div>
-              <img alt="Bed" src="@/assets/ic_bed@3x.png" >
-              <p>{{ house.rooms.bedrooms }}</p>
-            </div>
-            <div>
-              <img alt="Bathroom" src="@/assets/ic_bath@3x.png" >
-              <p>{{ house.rooms.bathrooms }}</p>
-            </div>
-            <div>
-              <img alt="Size" src="@/assets/ic_size@3x.png" >
-              <p>{{ house.size }} m2</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="tools">
-          <div>
-            <button><img alt="Edit icon" src="@/assets/ic_edit@3x.png" ></button>
-            <button><img alt="delete icon" src="@/assets/ic_delete@3x.png" ></button>
-          </div>
-        </div>
-      </div>
+      <ListingComponent :data="filteredAndSortedHouses" :navigate="navigateToHouseDetails" />
     </div>
     <div v-else>No results found. Please try another keyword.</div>
 
@@ -63,20 +32,18 @@
 import { useStore } from 'vuex';
 import { ref, onMounted, computed } from "vue";
 import { useRouter } from 'vue-router';
+import ListingComponent from './ListingComponent.vue'
 import './SearchCss.css'
 
 const router = useRouter();
 const store = useStore();
 const housesData = ref([]);
+const selectedHouseDetails = ref(null);
 
 onMounted(async () => {
   await store.dispatch('fetchHousesData');
   housesData.value = store.getters.getHousesData;
 });
-
-const convertNumberWithComma = (x) => {
-    return x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-}
 
 const searchQuery = ref("");
 
@@ -121,8 +88,10 @@ const sortBySize = () => {
   currentSortingOption.value = sortingOptions.SIZE;
 };
 
-const navigateToHouseDetails = (houseId) => {
-  store.dispatch('setSelectedHouseId', houseId);
+const navigateToHouseDetails = async (houseId) => {
+  await store.dispatch('setSelectedHouseId', houseId);
+  selectedHouseDetails.value = store.getters.getSelectedHouseDetails;
+
   router.push({ name: 'HouseDetails'});
 };
 

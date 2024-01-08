@@ -1,10 +1,18 @@
-import { createStore } from 'vuex'
-import axios from 'axios'
+import { createStore } from 'vuex';
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: 'https://api.intern.d-tt.nl/api/houses/',
+  headers: {
+    "X-API-Key": 'P6CU2iMrh_AFYnTqfIXjZcl4sN3bEk59',
+  },
+});
 
 export default createStore({
   state: {
     housesData: [],
     selectedHouseId: null,
+    selectedHouseDetails: null,
   },
   mutations: {
     setHousesData(state, data) {
@@ -15,23 +23,29 @@ export default createStore({
     },
     clearHouseId(state) {
       state.selectedHouseId = null;
+      state.selectedHouseDetails = null;
+    },
+    setHouseDetails(state, details) {
+      state.selectedHouseDetails = details;
     },
   },
   actions: {
     async fetchHousesData({ commit }) {
       try {
-        const response = await axios.get('https://api.intern.d-tt.nl/api/houses', {
-          headers: {
-            "X-API-Key": 'P6CU2iMrh_AFYnTqfIXjZcl4sN3bEk59',
-          },
-        });
+        const response = await api.get('');
         commit('setHousesData', response.data);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     },
-    setSelectedHouseId({ commit }, houseId) {
-      commit('setHouseId', houseId);
+    async setSelectedHouseId({ commit }, houseId) {
+      try {
+        commit('setHouseId', houseId);
+        const response = await api.get(`${houseId}`);
+        commit('setHouseDetails', response.data);
+      } catch (error) {
+        console.error('Error fetching house details:', error);
+      }
     },
     clearSelectedHouseId({ commit }) {
       commit('clearHouseId');
@@ -40,5 +54,6 @@ export default createStore({
   getters: {
     getHousesData: (state) => state.housesData,
     getSelectedHouseId: (state) => state.selectedHouseId,
+    getSelectedHouseDetails: (state) => state.selectedHouseDetails,
   },
 });
