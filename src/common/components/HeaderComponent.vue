@@ -7,40 +7,106 @@
         <router-link to="/about">About</router-link>
       </nav>
     </div>
+    <RouterView />
   </div>
-  <RouterView />
-</template>
+  <!-- Mobile/ teblet view -->
+  <div class="header-mobile">  
+    <RouterView />
 
-<style lang="scss">
+    <div class="wrapper">
+      <nav>
+        <router-link to="/" @click="toggleNav('/')">
+          <img class="icon" alt="DTT logo" :src="require(`@/assets/${activeHouseRef === '/' ? 'ic_mobile_navigarion_home_active' : 'ic_mobile_navigarion_home'}@3x.png`)" />
+        </router-link>
+        <router-link to="/about" @click="toggleNav('about')">
+          <img class="icon" alt="DTT logo" :src="require(`@/assets/${activeHouseRef === 'about' ? 'ic_mobile_navigarion_info_active' : 'ic_mobile_navigarion_info'}@3x.png`)" />
+        </router-link>
+      </nav>
+    </div>
+  </div>
+</template>
+<script setup>
+  import { ref, onMounted } from 'vue';
+
+  const activeHouseRef = ref('')
+
+  const toggleNav = (route) => {
+    activeHouseRef.value = activeHouseRef.value === route ? '' : route;
+  };
+  onMounted(() => {
+    const currentPath = window.location.pathname;
+    activeHouseRef.value = currentPath === '/' ? '/' : 'about';
+  });
+</script>
+
+<style>
+.icon {
+  width: 29px;
+  height: 29px;
+}
+.header-mobile .wrapper nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.header-mobile .wrapper {
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px -6px 7px;
+}
+.header-mobile nav {
+  padding: 20px 60px;
+}
+
+/* Desktop */
 .header {
   height: 78px;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-  .wrapper {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    width: 100%;
-    max-width: 1200px;
-    padding: 0 20px;
-    margin: 0 auto;
-  }
-  img {
-    width: 100px;
-    height: 38px;
-    margin-right: 50px;
-  }
+  display: none;
 }
-nav {
+.header img {
+  width: 100px;
+  height: 38px;
+  margin-right: 50px;
+}
+.header .wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  max-width: 780px;
+  padding: 0 20px;
+  margin: 0 auto;
+}
+.header nav {
   padding: 30px;
-  a {
-    font-weight: bold;
-    color: #4a4b4c;
-    margin-right: 50px;
-    text-decoration: none;
-
-    &.router-link-exact-active {
-      color: #000000;
-    }
+}
+.header nav a {
+  font-weight: bold;
+  color: #C3C3C3;
+  margin-right: 50px;
+  text-decoration: none;
+}
+.header nav .router-link-exact-active {
+  color: #000000;
+}
+@media (min-width: 600px) {
+  .header-mobile {
+    display: none;
+  }
+  .header {
+    display: block;
+  }
+  .header .wrapper {
+    max-width: 1000px;
   }
 }
+@media (min-width: 1024px) {
+  .header .wrapper {
+    max-width: 1000px;
+  }
+}
+
 </style>
