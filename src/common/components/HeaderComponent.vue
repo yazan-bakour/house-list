@@ -51,9 +51,10 @@
 }
 .header-mobile .wrapper {
   width: 100%;
-  position: absolute;
+  position: fixed;
   bottom: 0;
   left: 0;
+  background-color: #fff;
   box-shadow: rgba(149, 157, 165, 0.2) 0px -6px 7px;
 }
 .header-mobile nav {
@@ -75,7 +76,7 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  width: 100%;
+  box-sizing: content-box;
   max-width: 780px;
   padding: 0 20px;
   margin: 0 auto;
