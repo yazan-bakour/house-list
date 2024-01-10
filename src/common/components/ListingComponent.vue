@@ -1,16 +1,26 @@
 <script setup>
   import { defineProps } from 'vue';
+  import { useStore } from 'vuex';
+
+  const store = useStore();
 
   const props = defineProps(['data', 'navigate']);
+
+  const deleteHouse = async (houseId) => {
+    // TODO add popup
+    await store.dispatch('deleteHouseById', houseId);
+    await store.dispatch('fetchHousesData');
+  };
 
   const convertNumberWithComma = (x) => {
     return x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
   };
+  
 </script>
 
 <template>
-  <div v-for="house in data" :key="house.id" class="result-card" @click="props.navigate(house.id)">
-    <div class="image">
+  <div v-for="house in data" :key="house.id" class="result-card">
+    <div class="image" @click="props.navigate(house.id, 'HouseDetails')">
       <img alt="Result img" :src="house.image" >
     </div>
 
@@ -36,9 +46,137 @@
 
     <div class="tools">
       <div>
-        <button><img alt="Edit icon" src="@/assets/ic_edit@3x.png" ></button>
-        <button><img alt="delete icon" src="@/assets/ic_delete@3x.png" ></button>
+        <button @click="props.navigate(house.id, 'NewLisiting')"><img alt="Edit icon" src="@/assets/ic_edit@3x.png" ></button>
+        <button @click="deleteHouse(house.id)"><img alt="delete icon" src="@/assets/ic_delete@3x.png" ></button>
       </div>
     </div>
   </div>
 </template>
+<style>
+.result-card {
+  position: relative;
+  margin: 20px 0;
+  border-radius: 5px;
+  padding: 15px;
+  display: flex;
+  box-shadow: rgba(14, 30, 37, 0.12) -1px 2px 4px 0px, rgba(14, 30, 37, 0.12) 4px -3px 16px 0px;
+}
+.result-card .image {
+  display: flex;
+  flex: 1;
+  margin-right: 10px;
+  border-radius: 5px;
+  overflow: hidden;
+  cursor: pointer;
+  /* flex-grow: 12; */
+  /* width: 40%; */
+}
+.result-card .image img {
+  width: 110px;
+  /* height: 90px; */
+  margin: 0;
+}
+.result-card .info {
+  flex: 2;
+  /* width: 40%; */
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+}
+.result-card .tools {
+  position: absolute;
+  right: 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: start;
+  justify-content: end;
+}
+.tools img {
+  width: 18px;
+  height: 18px;
+}
+.result-card .tools button {
+  width: 48px;
+  height: 48px;
+  background: 0;
+}
+.rooms {
+  display: flex;
+}
+.result-card .rooms div {
+  display: flex;
+  align-items: start;
+  margin-right: 12px;
+}
+.rooms img {
+  width: 18px;
+  height: 18px;
+  margin-right: 10px;
+}
+.rooms p {
+  margin-bottom: 0;
+}
+.result-card .info p {
+  font-size: 12px;
+  margin: 0 0 9px 0;
+}
+.result-card .info .name {
+ font-weight: 700;
+ color: #000000;
+}
+.result-card .info .price {
+  font-weight: 500;
+  color: #4A4B4C;
+}
+.result-card .info .address {
+  font-weight: 300;
+  color: #C3C3C3;
+}
+
+@media (min-width: 480px) {
+  .result-card .image img {
+    width: 130px;
+    height: 118px;
+  }
+  .result-card .info p {
+    font-size: 18px; 
+  }
+  .result-card .info .address {
+    margin-bottom: 18px;
+  }
+}
+@media (min-width: 600px) {
+  .rooms img {
+    width: 24px;
+    height: 24px;
+  }
+  .result-card .image img {
+    width: 246px;
+    height: 180px;
+  }
+  .result-card .image {
+    border-radius: 5px;
+    height: 180px;
+    margin-right: 25px;
+    /* width: 40%; */
+  }
+  .result-card .info .name {
+    font-size: 22px;
+  }
+  .result-card .info p {
+    font-size: 18px; 
+    margin-bottom: 18px; 
+  }
+  .result-card .info .address {
+    margin-bottom: 25px;
+  }
+  .result-card .info {
+    padding-top: 10px;
+  }
+}
+@media (min-width: 1024px) {
+  .result-card .info {
+    flex: 3;
+  }
+}
+</style>

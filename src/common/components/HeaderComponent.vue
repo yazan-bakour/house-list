@@ -1,30 +1,3 @@
-<template>
-  <div class="header">
-    <div class="wrapper">
-      <img alt="DTT logo" src="@/assets/img_logo_dtt@3x.png" />
-      <nav>
-        <router-link to="/">Houses</router-link>
-        <router-link to="/about">About</router-link>
-      </nav>
-    </div>
-    <RouterView />
-  </div>
-  <!-- Mobile/ teblet view -->
-  <div class="header-mobile">  
-    <RouterView />
-
-    <div class="wrapper">
-      <nav>
-        <router-link to="/" @click="toggleNav('/')">
-          <img class="icon" alt="DTT logo" :src="require(`@/assets/${activeHouseRef === '/' ? 'ic_mobile_navigarion_home_active' : 'ic_mobile_navigarion_home'}@3x.png`)" />
-        </router-link>
-        <router-link to="/about" @click="toggleNav('about')">
-          <img class="icon" alt="DTT logo" :src="require(`@/assets/${activeHouseRef === 'about' ? 'ic_mobile_navigarion_info_active' : 'ic_mobile_navigarion_info'}@3x.png`)" />
-        </router-link>
-      </nav>
-    </div>
-  </div>
-</template>
 <script setup>
   import { ref, onMounted } from 'vue';
 
@@ -39,6 +12,31 @@
   });
 </script>
 
+<template>
+  <div class="header">
+    <div class="wrapper">
+      <img alt="DTT logo" src="@/assets/img_logo_dtt@3x.png" />
+      <nav>
+        <router-link to="/">Houses</router-link>
+        <router-link to="/about">About</router-link>
+      </nav>
+    </div>
+  </div>
+  <!-- Mobile/ teblet view -->
+  <div class="header-mobile">  
+    <div class="wrapper">
+      <nav>
+        <router-link to="/" @click="toggleNav('/')">
+          <img class="icon" alt="DTT logo" :src="require(`@/assets/${activeHouseRef === '/' ? 'ic_mobile_navigarion_home_active' : 'ic_mobile_navigarion_home'}@3x.png`)" />
+        </router-link>
+        <router-link to="/about" @click="toggleNav('about')">
+          <img class="icon" alt="DTT logo" :src="require(`@/assets/${activeHouseRef === 'about' ? 'ic_mobile_navigarion_info_active' : 'ic_mobile_navigarion_info'}@3x.png`)" />
+        </router-link>
+      </nav>
+    </div>
+  </div>
+</template>
+
 <style>
 .icon {
   width: 29px;
@@ -50,6 +48,7 @@
   align-items: center;
 }
 .header-mobile .wrapper {
+  z-index: 99;
   width: 100%;
   position: fixed;
   bottom: 0;

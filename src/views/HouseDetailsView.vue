@@ -37,79 +37,77 @@
 
 <template>
   <div class="house-details">
-    <div class="body-wrapper">
-      <button class="back" @click="navigateBackToHouseListing">
-        <img class="mobile" src="@/assets/ic_back_white@3x.png" alt="back">
-        <div>
-          <img class="desktop" src="@/assets/ic_back_grey@3x.png" alt="back">
-          <p>Back to overview</p>
-        </div>
-      </button>
-      <div class="childs-wrapper">
-        <div class="left-section">
-          <div class="main-image"><img :src="selectedHouseDetails.image" alt="main-image"></div>
-          <div class="details-container">
-            <div class="first-child">
-              <div class="info">
-                <p class="name">{{ selectedHouseDetails.location.street + ' ' + selectedHouseDetails.location.houseNumber }}</p>
-                <div class="group">
-                  <div class="location">
-                    <img src="@/assets/ic_location@3x.png" alt="location">
-                    <p>{{ selectedHouseDetails.location.zip + ' ' + selectedHouseDetails.location.city }}</p>
+    <button class="back" @click="navigateBackToHouseListing">
+      <img class="mobile" src="@/assets/ic_back_white@3x.png" alt="back">
+      <div>
+        <img class="desktop" src="@/assets/ic_back_grey@3x.png" alt="back">
+        <p>Back to overview</p>
+      </div>
+    </button>
+    <div class="childs-wrapper">
+      <div class="left-section">
+        <div class="main-image"><img :src="selectedHouseDetails.image" alt="main-image"></div>
+        <div class="details-container">
+          <div class="first-child">
+            <div class="info">
+              <p class="name">{{ selectedHouseDetails.location.street + ' ' + selectedHouseDetails.location.houseNumber }}</p>
+              <div class="group">
+                <div class="location">
+                  <img src="@/assets/ic_location@3x.png" alt="location">
+                  <p>{{ selectedHouseDetails.location.zip + ' ' + selectedHouseDetails.location.city }}</p>
+                </div>
+                <br>
+                <div class="child-group">
+                  <div class="price">
+                    <img src="@/assets/ic_price@3x.png" alt="price">
+                    <p>{{ convertNumberWithComma(selectedHouseDetails.price) }}</p>
                   </div>
-                  <br>
-                  <div class="child-group">
-                    <div class="price">
-                      <img src="@/assets/ic_price@3x.png" alt="price">
-                      <p>{{ convertNumberWithComma(selectedHouseDetails.price) }}</p>
-                    </div>
-                    <div class="size">
-                      <img src="@/assets/ic_size@3x.png" alt="size">
-                      <p>{{ selectedHouseDetails.size }} m2</p>
-                    </div>
-                    <div class="built">
-                      <img src="@/assets/ic_construction_date@3x.png" alt="constructed">
-                      <p>Built in {{ selectedHouseDetails.constructionYear }}</p>
-                    </div>
+                  <div class="size">
+                    <img src="@/assets/ic_size@3x.png" alt="size">
+                    <p>{{ selectedHouseDetails.size }} m2</p>
                   </div>
-                  <br>
-                  <div class="rooms">
-                    <div>
-                      <img alt="Bed" src="@/assets/ic_bed@3x.png" >
-                      <p>{{ selectedHouseDetails.rooms.bedrooms }}</p>
-                    </div>
-                    <div>
-                      <img alt="Bathroom" src="@/assets/ic_bath@3x.png" >
-                      <p>{{ selectedHouseDetails.rooms.bathrooms }}</p>
-                    </div>
-                    <div>
-                      <img alt="Size" src="@/assets/ic_garage@3x.png" >
-                      <p>{{ selectedHouseDetails.hasGarage }}</p>
-                    </div>
+                  <div class="built">
+                    <img src="@/assets/ic_construction_date@3x.png" alt="constructed">
+                    <p>Built in {{ selectedHouseDetails.constructionYear }}</p>
+                  </div>
+                </div>
+                <br>
+                <div class="rooms">
+                  <div>
+                    <img alt="Bed" src="@/assets/ic_bed@3x.png" >
+                    <p>{{ selectedHouseDetails.rooms.bedrooms }}</p>
+                  </div>
+                  <div>
+                    <img alt="Bathroom" src="@/assets/ic_bath@3x.png" >
+                    <p>{{ selectedHouseDetails.rooms.bathrooms }}</p>
+                  </div>
+                  <div>
+                    <img alt="Size" src="@/assets/ic_garage@3x.png" >
+                    <p>{{ selectedHouseDetails.hasGarage }}</p>
                   </div>
                 </div>
               </div>
-              <div class="tools">
-                <button class="edit"><img alt="Edit icon" src="@/assets/ic_edit_white@3x.png" ></button>
-                <button><img alt="delete icon" src="@/assets/ic_delete_white@3x.png" ></button>
-              </div>
             </div>
-            <div class="second-child">
-              <p>{{ selectedHouseDetails.description }}</p>
+            <div class="tools">
+              <button class="edit"><img alt="Edit icon" src="@/assets/ic_edit_white@3x.png" ></button>
+              <button><img alt="delete icon" src="@/assets/ic_delete_white@3x.png" ></button>
             </div>
           </div>
+          <div class="second-child">
+            <p>{{ selectedHouseDetails.description }}</p>
+          </div>
         </div>
-        <div class="right-section">
-          <p>Recommended for you</p>
-          <ListingComponent :data="filteredHousesData" :navigate="navigateToHouseDetails" />
-        </div>
+      </div>
+      <div class="right-section">
+        <p>Recommended for you</p>
+        <ListingComponent :data="filteredHousesData" :navigate="navigateToHouseDetails" />
       </div>
     </div>
   </div>
 </template>
 <style>
   .right-section {
-    display: none;
+    display: flex;
     flex-direction: column;
     width: 380px;
   }
@@ -120,9 +118,6 @@
     display: flex;
     padding-left: 20px;
     margin: 0;
-  }
-  .house-details .body-wrapper {
-    padding: 0;
   }
 
   .group {
@@ -171,7 +166,7 @@
     align-items: start;
     padding: 20px;
   }
-  .info .group p {
+  .details-container .info .group p {
     color: #4A4B4C;
   }
   .details-container .info .name {
@@ -185,7 +180,10 @@
   .tools .edit {
     margin-right: 10px;
   }
-  .back {
+  .house-details {
+    width: 100%;
+  }
+  .house-details .back {
     background: 0;
     border: 0;
     position: absolute;
@@ -195,11 +193,11 @@
   .main-image {
     display: flex;
   }
-  .back img  {
+  .house-details .back img  {
     width: 18px;
     height: 18px;
   }
-  .back div {
+  .house-details .back div {
     display: none;
   }
   .left-section .details-container {
@@ -235,23 +233,104 @@
     }
     .main-image img {
       margin: 0;
+      height: 420px;
     }
-    .back {
+    .house-details .back {
       position: inherit;
-      margin-left: 10px;
+      display: flex;
+      margin-bottom: 20px;
     }
-    .back div {
+    .house-details .back div {
       display: flex;
       align-items: center;
     }
-    .back .mobile {
+    .house-details .back .mobile {
       display: none;
     }
-    .back div img {
+    .house-details .back div img {
       margin-right: 10px;
     }
-    .details-container .tools {
+    .house-details .tools {
       position: relative; 
+    }
+    .right-section .result-card {
+      position: relative;
+      margin: 20px 0;
+      border-radius: 5px;
+      padding: 15px;
+      display: flex;
+      box-shadow: rgba(14, 30, 37, 0.12) -1px 2px 4px 0px, rgba(14, 30, 37, 0.12) 4px -3px 16px 0px;
+    }
+    .right-section .result-card .image {
+      display: flex;
+      flex: 1;
+      margin-right: 10px;
+      border-radius: 5px;
+      overflow: hidden;
+      cursor: pointer;
+      /* flex-grow: 12; */
+      /* width: 40%; */
+    }
+    .right-section .result-card .image img {
+      width: 110px;
+      /* height: 90px; */
+      margin: 0;
+    }
+    .right-section .result-card .info {
+      flex: 2;
+      /* width: 40%; */
+      display: flex;
+      flex-direction: column;
+      align-items: start;
+    }
+    .right-section .result-card .tools {
+      position: absolute;
+      right: 10px;
+      display: flex;
+      flex-direction: row;
+      align-items: start;
+      justify-content: end;
+    }
+    .right-section .tools img {
+      width: 18px;
+      height: 18px;
+    }
+    .right-section .result-card .tools button {
+      width: 48px;
+      height: 48px;
+      background: 0;
+    }
+    .right-section .rooms {
+      display: flex;
+    }
+    .right-section .result-card .rooms div {
+      display: flex;
+      align-items: start;
+      margin-right: 12px;
+    }
+    .right-section .rooms img {
+      width: 18px;
+      height: 18px;
+      margin-right: 10px;
+    }
+    .right-section .rooms p {
+      margin-bottom: 0;
+    }
+    .right-section .result-card .info p {
+      font-size: 12px;
+      margin: 0 0 9px 0;
+    }
+    .right-section .result-card .info .name {
+    font-weight: 700;
+    color: #000000;
+    }
+    .right-section .result-card .info .price {
+      font-weight: 500;
+      color: #4A4B4C;
+    }
+    .right-section .result-card .info .address {
+      font-weight: 300;
+      color: #C3C3C3;
     }
   }
   @media (min-width: 1024px) {
@@ -265,7 +344,7 @@
       flex-direction: row;
     }
     .right-section {
-      width: 300px;
+      width: 340px;
     }
     .house-details .left-section {
       margin-right: 20px;
