@@ -1,10 +1,20 @@
 
 <script setup>
+  import HouseDetailsLayout from './common/layouts/HouseDetailsLayout.vue';
   import MainLayout from './common/layouts/MainLayout.vue';
+  import { computed, getCurrentInstance } from 'vue';
+
+  const instance = getCurrentInstance();
+
+  const isHouseDetailsRoute = computed(() => {
+    return instance.proxy.$route?.name === 'HouseDetails';
+  });
+
 </script>
 
 <template>
-  <MainLayout />
+  <MainLayout v-if="!isHouseDetailsRoute" />
+  <HouseDetailsLayout v-if="isHouseDetailsRoute" />
 </template>
 
 <style>
@@ -36,6 +46,17 @@
   .main {
     padding-top: 10px;
   }
+  .house-details-main {
+    padding: 0;
+  }
+  .house-details-body-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 auto;
+    box-sizing: content-box;
+    padding-bottom: 150px;
+  }
   .body-wrapper {
     display: flex;
     flex-direction: column;
@@ -46,6 +67,9 @@
     padding-bottom: 150px;
   }
   @media (min-width: 600px) {
+    .house-details-main {
+      padding: 20px 0;
+    }
     .main {
       padding-top: 50px;
     }
@@ -59,6 +83,10 @@
   }
   @media (min-width: 1024px) {
     .body-wrapper {
+      max-width: 1000px;
+    }
+    .house-details-body-wrapper {
+      padding: 0 20px;
       max-width: 1000px;
     }
   }

@@ -59,7 +59,7 @@ export default createStore({
       }
     },
 
-    async uploadImage({ houseId, image }) {
+    async uploadImage({ dispatch }, { houseId, image }) {
       try {
         const formData = new FormData();
         formData.append('image', image);
@@ -69,6 +69,7 @@ export default createStore({
           },
         });
         console.log('Image uploaded successfully:', response.data);
+        dispatch('fetchHousesData');
       } catch (error) {
         console.error('Error uploading image:', error);
       }
@@ -76,7 +77,7 @@ export default createStore({
 
     async editHouseById({ dispatch }, { houseId, updatedHouseData }) {
       try {
-        const response = await api.put(`/${houseId}`, updatedHouseData);
+        const response = await api.post(`/${houseId}`, updatedHouseData);
         console.log('House edited successfully:', response.data);
         dispatch('fetchHousesData');
       } catch (error) {

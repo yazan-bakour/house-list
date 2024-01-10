@@ -9,7 +9,6 @@
   const deleteHouse = async (houseId) => {
     // TODO add popup
     await store.dispatch('deleteHouseById', houseId);
-    await store.dispatch('fetchHousesData');
   };
 
   const convertNumberWithComma = (x) => {

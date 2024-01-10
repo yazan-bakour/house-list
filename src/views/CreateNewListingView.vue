@@ -14,7 +14,7 @@
   const numberAddition = ref("");
   const zip = ref("");
   const city = ref("");
-  const picture = ref(null);
+  const image = ref(null);
   const price = ref("");
   const size = ref("");
   const hasGarage = ref(false);
@@ -40,15 +40,27 @@
     }
   });
 
-
-  const handleFileUpload = (event) => {
+  const handleFileUpload = async (event) => {
     const file = event.target.files[0];
-    picture.value = file;
+    image.value = file;
   };
 
   const navigateBackToHouseListing = () => {
-    router.push({ name: 'houses'});
+    if (selectedHouseDetails.value) {
+      router.push({ name: 'HouseDetails', params: { id: selectedHouseDetails.value.id } });
+    } else {
+      router.push({ name: 'houses'});
+    }
   };
+
+  const imageUpload = async (file, id) => {
+    if (id && file) {
+      await store.dispatch('uploadImage', {
+        houseId: id,
+        image: file
+      })
+    }
+  }
 
   const submitForm = async () => {
     if (selectedHouseDetails.value) {
@@ -68,9 +80,11 @@
           description: description.value,
           hasGarage: hasGarage.value
         }
-      })
+      });
+      imageUpload(image.value, selectedHouseDetails.value.id)
+      router.push({ name: 'HouseDetails', params: { id: selectedHouseDetails.value.id } });
     } else {
-      await store.dispatch('postNewHouse', {
+      const newHouseData = await store.dispatch('postNewHouse', {
         price: price.value,
         bedrooms: bedrooms.value,
         bathrooms: bathrooms.value,
@@ -84,6 +98,8 @@
         description: description.value,
         hasGarage: hasGarage.value
       });
+      imageUpload(image.value, newHouseData)
+      router.push({ name: 'HouseDetails', params: { id: newHouseData } });
     }
   };
 </script>
@@ -125,7 +141,6 @@
         <label for="picture">Upload Picture*</label>
         <input type="file" @change="handleFileUpload" accept="image/*" />
       </div>
-      <!-- "{"id":12,"image":null,"price":1,"size":1,"hasGarage":true,"street":"King Arthur Street","houseNumber":"21","houseNumberAddition":"B21F","zip":"1234BB","city":"Amsterdam","bedrooms":1,"bathrooms":1,"createdAt":"2023-03-02","description":"good house"}" -->
       <div>
         <label for="price">Price*</label>
         <input v-model="price" id="price" required />

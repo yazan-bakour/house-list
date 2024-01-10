@@ -1,14 +1,16 @@
 <script setup>
-  import { ref, onMounted } from 'vue';
+  import { ref, onMounted, getCurrentInstance } from 'vue';
 
   const activeHouseRef = ref('')
+
+  const instance = getCurrentInstance();
 
   const toggleNav = (route) => {
     activeHouseRef.value = activeHouseRef.value === route ? '' : route;
   };
   onMounted(() => {
-    const currentPath = window.location.pathname;
-    activeHouseRef.value = currentPath === '/' ? '/' : 'about';
+    const currentRoute = instance.proxy.$route?.name;
+    activeHouseRef.value = currentRoute === 'about' ? 'about' : '/';
   });
 </script>
 

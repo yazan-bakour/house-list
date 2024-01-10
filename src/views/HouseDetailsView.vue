@@ -1,20 +1,36 @@
 <script setup>
   import { useStore } from 'vuex';
   import { useRouter } from 'vue-router';
-  import { onMounted, computed } from "vue";
+  import { ref, onMounted, computed, watchEffect } from "vue";
   import ListingComponent from '@/common/components/ListingComponent.vue'
+  
   const router = useRouter();
+  const store = useStore();
+
+  // If we update an exisiting house
+  const newHouseData = ref(null)
+
+  const selectedHouseDetails = computed(() => store.getters.getSelectedHouseDetails ? store.getters.getSelectedHouseDetails[0] : '');
+
+  watchEffect(() => {
+    newHouseData.value = selectedHouseDetails.value
+  });
 
   const navigateBackToHouseListing = () => {
-    router.push({ name: 'houses'});
+    router.push({ name: 'houses' });
   }
+  
+  onMounted(async () => {
+    await store.dispatch('fetchHousesData');
+    const houseId = window.location.pathname.split('/').pop();
+    navigateToHouseDetails(houseId);
+  });
+  
 
   const convertNumberWithComma = (x) => {
-      return x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+    return x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
   }
 
-  const store = useStore();
-  const selectedHouseDetails = computed(() => store.getters.getSelectedHouseDetails[0]);
   const housesData = computed(() => store.getters.getHousesData);
 
   const filteredHousesData = computed(() => {
@@ -22,15 +38,10 @@
     return housesData.value.filter(house => house.id !== selectedHouseId).slice(0, 3);
   });
 
-  onMounted(async () => {
-    await store.dispatch('fetchHousesData');
-  });
-
   const navigateToHouseDetails = async (houseId) => {
     await store.dispatch('setSelectedHouseId', houseId);
     selectedHouseDetails.value = store.getters.getSelectedHouseDetails;
-
-    router.push({ name: 'HouseDetails'});
+    router.push({ name: 'HouseDetails', params: { id: houseId } });
   };
   
 </script>
@@ -46,51 +57,57 @@
     </button>
     <div class="childs-wrapper">
       <div class="left-section">
-        <div class="main-image"><img :src="selectedHouseDetails.image" alt="main-image"></div>
+        <div class="main-image"><img :src="newHouseData.image !== null && newHouseData.image" alt="main-image"></div>
         <div class="details-container">
           <div class="first-child">
             <div class="info">
-              <p class="name">{{ selectedHouseDetails.location.street + ' ' + selectedHouseDetails.location.houseNumber }}</p>
+              <p class="name">{{ newHouseData.location?.street + ' ' + newHouseData.location?.houseNumber }}</p>
               <div class="group">
                 <div class="location">
                   <img src="@/assets/ic_location@3x.png" alt="location">
-                  <p>{{ selectedHouseDetails.location.zip + ' ' + selectedHouseDetails.location.city }}</p>
+                  <p>{{ newHouseData.location?.zip + ' ' + newHouseData.location?.city }}</p>
                 </div>
                 <br>
                 <div class="child-group">
                   <div class="price">
                     <img src="@/assets/ic_price@3x.png" alt="price">
-                    <p>{{ convertNumberWithComma(selectedHouseDetails.price) }}</p>
+                    <p>{{ newHouseData.price && convertNumberWithComma(newHouseData.price) }}</p>
                   </div>
                   <div class="size">
                     <img src="@/assets/ic_size@3x.png" alt="size">
-                    <p>{{ selectedHouseDetails.size }} m2</p>
+                    <p>{{ newHouseData?.size }} m2</p>
                   </div>
                   <div class="built">
                     <img src="@/assets/ic_construction_date@3x.png" alt="constructed">
-                    <p>Built in {{ selectedHouseDetails.constructionYear }}</p>
+                    <p>Built in {{ newHouseData.constructionYear }}</p>
                   </div>
                 </div>
                 <br>
                 <div class="rooms">
                   <div>
                     <img alt="Bed" src="@/assets/ic_bed@3x.png" >
-                    <p>{{ selectedHouseDetails.rooms.bedrooms }}</p>
+                    <p>{{ newHouseData.rooms?.bedrooms }}</p>
                   </div>
                   <div>
                     <img alt="Bathroom" src="@/assets/ic_bath@3x.png" >
-                    <p>{{ selectedHouseDetails.rooms.bathrooms }}</p>
+                    <p>{{ newHouseData.rooms?.bathrooms }}</p>
                   </div>
                   <div>
                     <img alt="Size" src="@/assets/ic_garage@3x.png" >
-                    <p>{{ selectedHouseDetails.hasGarage }}</p>
+                    <p>{{ newHouseData.hasGarage }}</p>
                   </div>
                 </div>
               </div>
             </div>
             <div class="tools">
-              <button class="edit"><img alt="Edit icon" src="@/assets/ic_edit_white@3x.png" ></button>
-              <button><img alt="delete icon" src="@/assets/ic_delete_white@3x.png" ></button>
+              <button class="edit">
+                <img class="mobile" alt="Edit icon" src="@/assets/ic_edit_white@3x.png" >
+                <img class="desktop" alt="Edit icon desktop" src="@/assets/ic_edit@3x.png" >
+              </button>
+              <button class="delete">
+                <img class="mobile" alt="delete icon" src="@/assets/ic_delete_white@3x.png" >
+                <img class="desktop" alt="delete icon desktop" src="@/assets/ic_delete@3x.png" >
+              </button>
             </div>
           </div>
           <div class="second-child">
@@ -109,14 +126,16 @@
   .right-section {
     display: flex;
     flex-direction: column;
-    width: 380px;
+    padding: 0 20px;
+  }
+  .left-section .tools .desktop {
+    display: none;
   }
   .right-section p {
     font-size: 18px;
     font-weight: 700;
     color: #000000;
     display: flex;
-    padding-left: 20px;
     margin: 0;
   }
 
@@ -141,7 +160,9 @@
     margin-bottom: 0;
   }
   .rooms div {
+    display: flex;
     align-items: end;
+    margin-right: 12px;
   }
 
   .group .child-group {
@@ -210,6 +231,10 @@
     margin-bottom: 20px;
   }
   .details-container .first-child {
+    display: flex;
+    flex-direction: row;
+    align-items: start;
+    justify-content: space-between;
     background-color: #fff;
   }
   .details-container .second-child {
@@ -227,18 +252,26 @@
     height: 300px;
     width: 100%;
   }
+  .right-section .result-card .tools {
+    right: 0;
+    top: 3px;
+  }
   @media (min-width: 600px) {
-    .right-section {
-      width: 100%;
+    .right-section .result-card .info {
+      padding-top: 0;
+    }
+    .left-section .tools .desktop {
+      display: flex;
     }
     .main-image img {
       margin: 0;
-      height: 420px;
+      height: auto;
     }
     .house-details .back {
       position: inherit;
       display: flex;
       margin-bottom: 20px;
+      margin-left: 15px
     }
     .house-details .back div {
       display: flex;
@@ -251,7 +284,8 @@
       margin-right: 10px;
     }
     .house-details .tools {
-      position: relative; 
+      position: relative;
+      top: 0;
     }
     .right-section .result-card {
       position: relative;
@@ -268,12 +302,13 @@
       border-radius: 5px;
       overflow: hidden;
       cursor: pointer;
+      height: 90px;
       /* flex-grow: 12; */
       /* width: 40%; */
     }
     .right-section .result-card .image img {
       width: 110px;
-      /* height: 90px; */
+      height: 90px;
       margin: 0;
     }
     .right-section .result-card .info {
@@ -285,7 +320,8 @@
     }
     .right-section .result-card .tools {
       position: absolute;
-      right: 10px;
+      right: 5px;
+      top: 8px;
       display: flex;
       flex-direction: row;
       align-items: start;
@@ -296,11 +332,12 @@
       height: 18px;
     }
     .right-section .result-card .tools button {
-      width: 48px;
-      height: 48px;
+      width: 38px;
+      height: 38px;
       background: 0;
+      padding: 0;
     }
-    .right-section .rooms {
+    .rooms {
       display: flex;
     }
     .right-section .result-card .rooms div {
@@ -315,10 +352,15 @@
     }
     .right-section .rooms p {
       margin-bottom: 0;
+      padding: 0;
+    }
+    .right-section .result-card .rooms p {
+      padding: 0;
     }
     .right-section .result-card .info p {
       font-size: 12px;
       margin: 0 0 9px 0;
+      padding: 0;
     }
     .right-section .result-card .info .name {
     font-weight: 700;
@@ -332,8 +374,18 @@
       font-weight: 300;
       color: #C3C3C3;
     }
+    .right-section .result-card .info {
+      flex: 4;
+    }
   }
+
   @media (min-width: 1024px) {
+    .house-details .back {
+      margin-left: 0;
+    }
+    .right-section .result-card .info {
+      flex: 2;
+    }
     .left-section .details-container {
       border-radius: 0;
       overflow: visible;
@@ -347,7 +399,7 @@
       width: 340px;
     }
     .house-details .left-section {
-      margin-right: 20px;
+      margin-right: 50px;
     }
   }
 </style>

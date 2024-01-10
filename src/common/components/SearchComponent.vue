@@ -1,6 +1,6 @@
 <script setup>
   import { useStore } from 'vuex';
-  import { ref, onMounted, computed } from "vue";
+  import { ref, onMounted, computed, watchEffect } from "vue";
   import { useRouter } from 'vue-router';
   import ListingComponent from './ListingComponent.vue'
 
@@ -10,8 +10,10 @@
   const selectedHouseDetails = ref(null);
 
   onMounted(async () => {
+    watchEffect(() => {
+      housesData.value = store.getters.getHousesData;
+    });
     await store.dispatch('fetchHousesData');
-    housesData.value = store.getters.getHousesData;
   });
 
   const searchQuery = ref("");
@@ -60,8 +62,7 @@
   const navigateToHouseDetails = async (houseId, route) => {
     await store.dispatch('setSelectedHouseId', houseId);
     selectedHouseDetails.value = store.getters.getSelectedHouseDetails;
-
-    router.push({ name: route});
+    router.push({ name: route, params: { id: houseId } });
   };
 </script>
 
