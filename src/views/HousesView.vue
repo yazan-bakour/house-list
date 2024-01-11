@@ -5,6 +5,7 @@
   
   const store = useStore()
   const router = useRouter();
+
   const createNewLisiting = () => {
     store.commit('clearHouseId');
     router.push({ name: 'NewLisiting'});
@@ -79,7 +80,7 @@
     padding: 8px 15px;
   }
   .desktop-button-container p {
-    width: 100px;
+    width: 130px;
   }
   .desktop-button-container .icon-desktop {
     width: 18px;

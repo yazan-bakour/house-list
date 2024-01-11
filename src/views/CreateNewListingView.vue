@@ -9,6 +9,11 @@
 
   const selectedHouseDetails = computed(() => store.getters.getSelectedHouseDetails ? store.getters.getSelectedHouseDetails[0] : '');
 
+  const fileInput = ref(null);
+  const uploadedFileUrl = ref(null);
+
+  const apiError = ref(null)
+  
   const streetName = ref("");
   const houseNumber = ref("");
   const numberAddition = ref("");
@@ -40,9 +45,14 @@
     }
   });
 
+  const triggerFileInput = () => {
+    fileInput.value.click();
+  };
+
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     image.value = file;
+    uploadedFileUrl.value = URL.createObjectURL(file);
   };
 
   const navigateBackToHouseListing = () => {
@@ -99,12 +109,18 @@
         hasGarage: hasGarage.value
       });
       imageUpload(image.value, newHouseData)
-      router.push({ name: 'HouseDetails', params: { id: newHouseData } });
+      if (newHouseData) {
+        router.push({ name: 'HouseDetails', params: { id: newHouseData } });
+      }
     }
+    apiError.value = store.getters.getPostNewHouseError;
   };
 </script>
 
 <template>
+  <div v-if="apiError" class="snack-bar">
+    <p>{{ apiError.value }}</p>
+  </div>
   <div class="create-container">
     <div class="heading">
       <button class="back" @click="navigateBackToHouseListing">
@@ -117,38 +133,41 @@
     <form @submit.prevent="submitForm">
       <div>
         <label for="street">Street Name*</label>
-        <input v-model="streetName" id="street" required />
+        <input placeholder="Enter the street name" v-model="streetName" id="street" required />
       </div>
       <div class="pair">
         <div>
           <label for="houseNumber">House Number*</label>
-          <input v-model="houseNumber" id="houseNumber" required />
+          <input placeholder="Enter house number" v-model="houseNumber" id="houseNumber" required />
         </div>
         <div>
           <label for="addition">Addition (optional)</label>
-          <input v-model="numberAddition" id="addition" />
+          <input placeholder="e.g A" v-model="numberAddition" id="addition" />
         </div>
       </div>
       <div>
         <label for="postalCode">Postal Code*</label>
-        <input v-model="zip" id="postalCode" required />
+        <input placeholder="e.g 1000 AA" v-model="zip" id="postalCode" required />
       </div>
       <div>
         <label for="city">City*</label>
-        <input v-model="city" id="city" required />
+        <input placeholder="e.g Utrecht" v-model="city" id="city" required />
       </div>
       <div>
-        <label for="picture">Upload Picture*</label>
-        <input type="file" @change="handleFileUpload" accept="image/*" />
+        <label for="picture">Upload Picture (PNG or JPG)*</label>
+        <div class="uploader">
+          <input ref="fileInput" type="file" style="display: none" @change="handleFileUpload" accept="image/*" />
+          <img :class="uploadedFileUrl ? 'uploaded-image' : 'normal-image'" :src="uploadedFileUrl || require('@/assets/ic_upload@3x.png')" alt="Upload" @click="triggerFileInput" />
+        </div>
       </div>
       <div>
         <label for="price">Price*</label>
-        <input v-model="price" id="price" required />
+        <input placeholder="e.g €150.000" v-model="price" id="price" required />
       </div>
       <div class="pair">
         <div>
           <label for="size">Size*</label>
-          <input v-model="size" id="size" required />
+          <input placeholder="e.g 60m2" v-model="size" id="size" required />
         </div>
         <div>
           <label for="garage">Garage*</label>
@@ -158,16 +177,17 @@
       <div class="pair">
         <div>
           <label for="bedrooms">Bedrooms*</label>
-          <input v-model="bedrooms" id="bedrooms" required />
+          <input placeholder="Enter amount" v-model="bedrooms" id="bedrooms" required />
         </div>
         <div>
           <label for="bathrooms">Bathrooms*</label>
-          <input v-model="bathrooms" id="bathrooms" required />
+          <input placeholder="Enter amount" v-model="bathrooms" id="bathrooms" required />
         </div>
       </div>
       <div>
-        <label for="constructionDate">Construction Date*</label>
+        <label placeholder="e.g 1990" for="constructionDate">Construction Date*</label>
         <input
+          placeholder="Enter description"
           v-model="constructionYear"
           id="constructionDate"
           required
@@ -183,12 +203,51 @@
 </template>
 
 <style>
+  .snack-bar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 200px;
+    height: auto;
+    background-color: #EB5440;
+  }
   .create-container {
     display: flex;
     flex-direction: column;
     align-self: start;
     width: 100%;
-    padding-top: 20px;
+    position: relative;
+  }
+  .create-container .uploader {
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #4A4B4C;
+    border-style: dashed;
+    margin-bottom: 0;
+  }
+  .create-container .uploader img {
+    cursor: pointer;
+    width: 28px;
+  }
+  .create-container .uploader .normal-image {
+    width: 28px;
+  }
+  .create-container .uploader .uploaded-image {
+    width: 100%;
+    height: inherit;
+  }
+  .create-container .main-background {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 0;
+  }
+  .create-container .container-body {
+    position: inherit;
+    z-index: 1;
   }
   .create-container .heading {
     display: flex;
@@ -204,11 +263,12 @@
     flex: 1;
     background: 0;
     border: 0;
-    margin-bottom: 20px;
+    margin-bottom: 40px;
     padding: 0;
   }
   .create-container .back p {
     display: none;
+    font-size: 16px;
   }
   .create-container .back img  {
     width: 18px;
@@ -232,24 +292,25 @@
   .create-container form div {
     display: flex;
     flex-direction: column;
-    margin-bottom: 20px;
+    margin-bottom: 40px;
     align-items: start;
   }
   .create-container form div label {
     margin-bottom: 10px;
-    font-size: 14px;
   }
   .create-container form div input {
     height: 30px;
     border-radius: 6px;
-    border: 1px solid #C3C3C3;
+    border: 1px solid #E8E8E8;
     width: 100%;
     padding-left: 10px;
+    font-size: 14px;
+    font-family: 'Open Sans', sans-serif;
   }
   .create-container form div textarea {
     height: 100px;
     border-radius: 6px;
-    border: 1px solid #C3C3C3;
+    border: 1px solid #E8E8E8;
     width: 100%;
     padding: 10px;
   }

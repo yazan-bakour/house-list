@@ -3,11 +3,15 @@
   import { useRouter } from 'vue-router';
   import { ref, onMounted, computed, watchEffect } from "vue";
   import ListingComponent from '@/common/components/ListingComponent.vue'
-  
+  import ModalComponent from '@/common/components/ModalComponent.vue';
+  import { formatNumberWithComma } from '@/helper';
+
   const router = useRouter();
   const store = useStore();
 
-  // If we update an exisiting house
+  const activeModal = ref(false);
+
+  // If we edit and update an exisiting house
   const newHouseData = ref(null)
 
   const selectedHouseDetails = computed(() => store.getters.getSelectedHouseDetails ? store.getters.getSelectedHouseDetails[0] : '');
@@ -25,11 +29,6 @@
     const houseId = window.location.pathname.split('/').pop();
     navigateToHouseDetails(houseId);
   });
-  
-
-  const convertNumberWithComma = (x) => {
-    return x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-  }
 
   const housesData = computed(() => store.getters.getHousesData);
 
@@ -38,12 +37,21 @@
     return housesData.value.filter(house => house.id !== selectedHouseId).slice(0, 3);
   });
 
-  const navigateToHouseDetails = async (houseId) => {
+  const deleteHouse = async (houseId) => {
+    await store.dispatch('deleteHouseById', houseId);
+    store.dispatch('toggleModal');
+  };
+
+  const toggleModal = (houseId) => {
+    activeModal.value = !activeModal.value;
+    store.dispatch('toggleModal', houseId);
+  };
+
+  const navigateToHouseDetails = async (houseId, route) => {
     await store.dispatch('setSelectedHouseId', houseId);
     selectedHouseDetails.value = store.getters.getSelectedHouseDetails;
-    router.push({ name: 'HouseDetails', params: { id: houseId } });
+    router.push({ name: route, params: { id: houseId } });
   };
-  
 </script>
 
 <template>
@@ -71,7 +79,7 @@
                 <div class="child-group">
                   <div class="price">
                     <img src="@/assets/ic_price@3x.png" alt="price">
-                    <p>{{ newHouseData.price && convertNumberWithComma(newHouseData.price) }}</p>
+                    <p>{{ newHouseData.price && formatNumberWithComma(newHouseData.price) }}</p>
                   </div>
                   <div class="size">
                     <img src="@/assets/ic_size@3x.png" alt="size">
@@ -100,14 +108,26 @@
               </div>
             </div>
             <div class="tools">
-              <button class="edit">
+              <button class="edit" @click="navigateToHouseDetails(newHouseData.id, 'NewLisiting')">
                 <img class="mobile" alt="Edit icon" src="@/assets/ic_edit_white@3x.png" >
                 <img class="desktop" alt="Edit icon desktop" src="@/assets/ic_edit@3x.png" >
               </button>
-              <button class="delete">
+              <button class="delete" @click="toggleModal(newHouseData.id)">
                 <img class="mobile" alt="delete icon" src="@/assets/ic_delete_white@3x.png" >
                 <img class="desktop" alt="delete icon desktop" src="@/assets/ic_delete@3x.png" >
               </button>
+              <ModalComponent v-if="activeModal">
+                <div class="modal-wrapper">
+                  <div class="texts">
+                    <h1>Delete listing</h1>
+                    <p>Are you sure you want to this listing? This action cannot be undone.</p>
+                  </div>
+                  <div class="buttons">
+                    <button class="delete" @click="deleteHouse(newHouseData.id)" type="button">YES, DELETE</button>
+                    <button class="cancle" @click="toggleModal(newHouseData.id)" type="button">GO BACK</button>
+                  </div>
+                </div>
+              </ModalComponent>
             </div>
           </div>
           <div class="second-child">
@@ -246,7 +266,8 @@
     color: #4A4B4C;
     font-size: 14px;
     text-align: left;
-    line-height: 16px;
+    line-height: 22px;
+    font-family: 'Open Sans', sans-serif;
   }
   .main-image img {
     height: 300px;

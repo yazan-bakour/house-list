@@ -1,19 +1,25 @@
 <script setup>
-  import { defineProps } from 'vue';
+  import { defineProps, ref, computed } from 'vue';
   import { useStore } from 'vuex';
+  import ModalComponent from './ModalComponent.vue'
+  import { formatNumberWithComma } from '@/helper';
 
   const store = useStore();
+  const activeModal = ref(false);
 
   const props = defineProps(['data', 'navigate']);
 
   const deleteHouse = async (houseId) => {
-    // TODO add popup
     await store.dispatch('deleteHouseById', houseId);
+    store.dispatch('toggleModal');
   };
 
-  const convertNumberWithComma = (x) => {
-    return x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+  const toggleModal = (houseId) => {
+    activeModal.value = !activeModal.value;
+    store.dispatch('toggleModal', houseId);
   };
+
+  const isModalVisible = computed(() => (houseId) => store.getters.isVisibleModal(houseId));
   
 </script>
 
@@ -25,7 +31,7 @@
 
     <div class="info">
       <p class="name">{{ house.location.street + ' ' + house.location.houseNumber }}</p>
-      <p class="price">€ {{ convertNumberWithComma(house.price) }}</p>
+      <p class="price">€ {{ formatNumberWithComma(house.price) }}</p>
       <p class="address">{{ house.location.zip + ' ' + house.location.city }}</p>
       <div class="rooms">
         <div>
@@ -46,8 +52,20 @@
     <div class="tools">
       <div>
         <button @click="props.navigate(house.id, 'NewLisiting')"><img alt="Edit icon" src="@/assets/ic_edit@3x.png" ></button>
-        <button @click="deleteHouse(house.id)"><img alt="delete icon" src="@/assets/ic_delete@3x.png" ></button>
+        <button @click="toggleModal(house.id)"><img alt="delete icon" src="@/assets/ic_delete@3x.png" ></button>
       </div>
+      <ModalComponent v-if="isModalVisible(house.id)">
+        <div class="modal-wrapper">
+          <div class="texts">
+            <h1>Delete listing</h1>
+            <p>Are you sure you want to this listing? This action cannot be undone.</p>
+          </div>
+          <div class="buttons">
+            <button class="delete" @click="deleteHouse(house.id)" type="button">YES, DELETE</button>
+            <button class="cancle" @click="toggleModal(house.id)" type="button">GO BACK</button>
+          </div>
+        </div>
+      </ModalComponent>
     </div>
   </div>
 </template>

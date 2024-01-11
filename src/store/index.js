@@ -13,6 +13,8 @@ export default createStore({
     housesData: [],
     selectedHouseId: null,
     selectedHouseDetails: null,
+    error: null,
+    visibleModals: [],
   },
   mutations: {
     setHousesData(state, data) {
@@ -28,8 +30,22 @@ export default createStore({
     setHouseDetails(state, details) {
       state.selectedHouseDetails = details;
     },
+    setPostNewHouseError(state, newError) {
+      state.error = newError
+    },
+    toggleModal(state, houseId) {
+      const index = state.visibleModals.indexOf(houseId);
+      if (index !== -1) {
+        state.visibleModals.splice(index, 1);
+      } else {
+        state.visibleModals.push(houseId);
+      }
+    },
   },
   actions: {
+    toggleModal({ commit }, houseId) {
+      commit('toggleModal', houseId);
+    },
     async fetchHousesData({ commit }) {
       try {
         const response = await api.get('');
@@ -48,11 +64,14 @@ export default createStore({
       }
     },
 
-    async postNewHouse({ dispatch }, newHouseData) {
+    async postNewHouse({ dispatch, commit }, newHouseData) {
       try {
         const response = await api.post('', newHouseData);
         dispatch('fetchHousesData');
         console.log('Response:', response);
+        if (typeof response.data === 'string' || response.data.code) {
+          commit('setPostNewHouseError', response.data.code || response.data)
+        }
         return response.data.id;
       } catch (error) {
         console.error('Error posting new house:', error);
@@ -103,5 +122,7 @@ export default createStore({
     getHousesData: (state) => state.housesData,
     getSelectedHouseId: (state) => state.selectedHouseId,
     getSelectedHouseDetails: (state) => state.selectedHouseDetails,
+    getPostNewHouseError: (state) => state.error,
+    isVisibleModal: (state) => (houseId) => state.visibleModals.includes(houseId),
   },
 });

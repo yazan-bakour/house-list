@@ -24,14 +24,22 @@
   p {
      margin: 0;
   }
+  label {
+    font-size: 12px;
+  }
   h1 {
-    font-size: 20px;
+    font-size: 18px;
+  }
+  h2 {
+    font-size: 14px;
   }
   button {
+    font-size: 12px;
+    font-weight: 600;
     cursor: pointer;
   }
   #app {
-    font-family: Avenir, Helvetica, Arial, sans-serif;
+    font-family: 'Montserrat', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
@@ -67,6 +75,18 @@
     padding-bottom: 150px;
   }
   @media (min-width: 600px) {
+    button {
+      font-size: 18px;
+    }
+    h1 {
+      font-size: 32px;
+    }
+    h2 {
+      font-size: 22px;
+    }
+    label {
+      font-size: 14px;
+    }
     .house-details-main {
       padding: 20px 0;
     }

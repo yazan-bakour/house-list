@@ -69,9 +69,8 @@
   display: none;
 }
 .header img {
-  width: 100px;
-  height: 38px;
-  margin-right: 50px;
+  height: 40px;
+  margin-right: 30px;
 }
 .header .wrapper {
   display: flex;
