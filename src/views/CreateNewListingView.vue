@@ -3,7 +3,7 @@
   import { ref, computed, onMounted, watchEffect } from "vue";
   import { useStore } from 'vuex';
   import { useRouter } from 'vue-router';
-// TODO add validation, background Image, and fix image upload and edit api
+
   const store = useStore();
   const router = useRouter();
 
@@ -12,7 +12,6 @@
   const fileInput = ref(null);
   const uploadedFileUrl = ref(null);
 
-  const apiError = ref(null)
   const valid = ref(false)
   const validationCondition = ref(true)
   
@@ -134,22 +133,18 @@
           description: description.value,
           hasGarage: hasGarage.value
         });
-        imageUpload(image.value, newHouseData)
+        await imageUpload(image.value, newHouseData)
         validationCondition.value = false
         if (newHouseData) {
           router.push({ name: 'HouseDetails', params: { id: newHouseData } });
         }
       }
-    } 
-    apiError.value = store.getters.getPostNewHouseError;
+    }
   };
   const isEditButtonClicked = store.getters.isEditButtonClicked
 </script>
 
 <template>
-  <div v-if="apiError" class="snack-bar">
-    <p>{{ apiError.value }}</p>
-  </div>
   <div class="create-container">
     <div class="heading">
       <button class="back" @click="navigateBackToHouseListing">
@@ -162,13 +157,13 @@
     <form @submit.prevent="submitForm">
       <div class="single-field-h">
         <label for="street">Street Name*</label>
-        <input placeholder="Enter the street name" v-model="streetName" id="street"  />
+        <input :class="valid && !streetName ? 'inputBorderError' : ''" placeholder="Enter the street name" v-model="streetName" id="street"  />
         <p class="validation" v-if="valid && !streetName">Require filed missing </p>
       </div>
       <div class="pair">
         <div>
           <label for="houseNumber">House Number*</label>
-          <input placeholder="Enter house number" v-model="houseNumber" id="houseNumber"  />
+          <input :class="valid && !houseNumber ? 'inputBorderError' : ''" placeholder="Enter house number" v-model="houseNumber" id="houseNumber"  />
           <p class="validation" v-if="valid && !houseNumber">Require filed missing </p>
         </div>
         <div>
@@ -178,17 +173,17 @@
       </div>
       <div class="single-field-h">
         <label for="postalCode">Postal Code*</label>
-        <input placeholder="e.g 1000 AA" v-model="zip" id="postalCode"  />
+        <input :class="valid && !zip ? 'inputBorderError' : ''" placeholder="e.g 1000 AA" v-model="zip" id="postalCode"  />
         <p class="validation" v-if="valid && !zip">Require filed missing </p>
       </div>
       <div class="single-field-h">
         <label for="city">City*</label>
-        <input placeholder="e.g Utrecht" v-model="city" id="city"  />
+        <input :class="valid && !city ? 'inputBorderError' : ''" placeholder="e.g Utrecht" v-model="city" id="city"  />
         <p class="validation" v-if="valid && !city">Require filed missing </p>
       </div>
       <div class="large-h">
         <label for="picture">Upload Picture (PNG or JPG)*</label>
-        <div class="uploader">
+        <div :class="valid && !image ? 'inputBorderError' : ''" class="uploader">
           <input ref="fileInput" type="file" style="display: none" @change="handleFileUpload" accept="image/*" />
           <img :class="uploadedFileUrl ? 'uploaded-image' : 'normal-image'" :src="uploadedFileUrl || require('@/assets/ic_upload@3x.png')" alt="Upload" @click="triggerFileInput" />
         </div>
@@ -196,18 +191,18 @@
       </div>
       <div class="single-field-h">
         <label for="price">Price*</label>
-        <input placeholder="e.g €150.000" v-model="price" id="price"  />
+        <input :class="valid && !price ? 'inputBorderError' : ''" placeholder="e.g €150.000" v-model="price" id="price"  />
         <p class="validation" v-if="valid && !price">Require filed missing </p>
       </div>
       <div class="pair">
         <div>
           <label for="size">Size*</label>
-          <input placeholder="e.g 60m2" v-model="size" id="size"  />
+          <input :class="valid && !size ? 'inputBorderError' : ''" placeholder="e.g 60m2" v-model="size" id="size"  />
           <p class="validation" v-if="valid && !size">Require filed missing </p>
         </div>
         <div class="garage">
           <label for="garage">Garage*</label>
-          <select id="garage" v-model="hasGarage">
+          <select :class="valid && !hasGarage ? 'inputBorderError' : ''" id="garage" v-model="hasGarage">
             <option disabled :value="null">Select</option>
             <option :value="true">Yes</option>
             <option :value="false">No</option>
@@ -218,23 +213,23 @@
       <div class="pair">
         <div>
           <label for="bedrooms">Bedrooms*</label>
-          <input placeholder="Enter amount" v-model="bedrooms" id="bedrooms"  />
+          <input :class="valid && !bedrooms ? 'inputBorderError' : ''" placeholder="Enter amount" v-model="bedrooms" id="bedrooms"  />
           <p class="validation" v-if="valid && !bedrooms">Require filed missing </p>
         </div>
         <div>
           <label for="bathrooms">Bathrooms*</label>
-          <input placeholder="Enter amount" v-model="bathrooms" id="bathrooms"  />
+          <input :class="valid && !bathrooms ? 'inputBorderError' : ''" placeholder="Enter amount" v-model="bathrooms" id="bathrooms"  />
           <p class="validation" v-if="valid && !bathrooms">Require filed missing </p>
         </div>
       </div>
       <div class="single-field-h">
         <label placeholder="e.g 1990" for="constructionDate">Construction Date*</label>
-        <input placeholder="Enter description" v-model="constructionYear" id="constructionDate" />
+        <input :class="valid && !constructionYear ? 'inputBorderError' : ''" placeholder="Enter description" v-model="constructionYear" id="constructionDate" />
         <p class="validation" v-if="valid && !constructionYear">Require filed missing </p>
       </div>
       <div class="large-h">
         <label for="description">Description*</label>
-        <textarea placeholder="Description" v-model="description" id="description" ></textarea>
+        <textarea :class="valid && !description ? 'inputBorderError' : ''" placeholder="Description" v-model="description" id="description" ></textarea>
         <p class="validation" v-if="valid && !description">Require filed missing </p>
       </div>
       <div class="submit-button">
@@ -257,14 +252,6 @@
     color: var(--color-background-primary);
     font-size: 12px;
     font-style: italic;
-  }
-  .snack-bar {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 200px;
-    height: auto;
-    background-color: var(--color-background-primary);
   }
   .create-container {
     display: flex;
@@ -375,6 +362,9 @@
     padding-left: 10px;
     font-size: 14px;
     font-family: 'Open Sans', sans-serif;
+  }
+  .create-container form div .inputBorderError {
+    border: 1px solid var(--color-background-primary);
   }
   .create-container form div textarea {
     height: 100px;

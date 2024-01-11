@@ -223,6 +223,10 @@
   .tools .edit {
     margin-right: 10px;
   }
+  .left-section .tools button {
+    width: 38px;
+    height: 38px;
+  }
   .house-details {
     width: 100%;
   }
@@ -286,6 +290,9 @@
     .left-section .tools .desktop {
       display: flex;
     }
+    .left-section .tools .mobile {
+      display: none;
+    }
     .main-image img {
       margin: 0;
       height: auto;
@@ -308,7 +315,7 @@
     }
     .house-details .tools {
       position: relative;
-      top: 0;
+      top: 12px;
     }
     .right-section .result-card {
       position: relative;
@@ -325,13 +332,13 @@
       border-radius: 5px;
       overflow: hidden;
       cursor: pointer;
-      height: 90px;
+      height: 110px;
       /* flex-grow: 12; */
       /* width: 40%; */
     }
     .right-section .result-card .image img {
-      width: 110px;
-      height: 90px;
+      width: 150px;
+      height: 110px;
       margin: 0;
     }
     .right-section .result-card .info {
@@ -351,12 +358,12 @@
       justify-content: end;
     }
     .right-section .tools img {
-      width: 18px;
-      height: 18px;
+      width: 16px;
+      height: 16px;
     }
     .right-section .result-card .tools button {
-      width: 38px;
-      height: 38px;
+      width: 36px;
+      height: 36px;
       background: 0;
       padding: 0;
     }
@@ -403,6 +410,22 @@
   }
 
   @media (min-width: 1024px) {
+    .right-section .rooms img {
+      width: 16px;
+      height: 16px;
+    }
+    .right-section .result-card .image {
+      height: 90px;
+    }
+    .right-section .result-card .image img {
+      width: 110px;
+      height: 90px;
+    }
+    .right-section .result-card .tools button {
+      width: 30px;
+      height: 30px;
+      margin-top: 5px;
+    }
     .house-details .back {
       margin-left: 0;
     }

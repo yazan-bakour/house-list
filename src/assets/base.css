@@ -7,6 +7,7 @@
   
   --e-c-primary: #EB5440;
   --e-c-secondary: #4A4B4C;
+  --e-c-message: #158039;
 
   --t-c-primary: #000000;
   --t-c-secondary: #4A4B4C;
@@ -27,6 +28,7 @@
   --color-text-primary: var(--t-c-primary);
   --color-text-secondary: var(--t-c-secondary);
   --color-text-hyperlink: var(--t-c-hyperlink);
+  --color-background-message: var(--e-c-message);
 
   --section-gap: 160px;
 }

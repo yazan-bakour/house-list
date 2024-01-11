@@ -11,7 +11,7 @@
 
   const deleteHouse = async (houseId) => {
     await store.dispatch('deleteHouseById', houseId);
-    store.dispatch('toggleModal');
+    store.dispatch('toggleModal', houseId);
   };
 
   const toggleModal = (houseId) => {

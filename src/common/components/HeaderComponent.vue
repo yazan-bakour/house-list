@@ -71,7 +71,7 @@
   box-shadow: rgba(149, 157, 165, 0.2) 0px -6px 7px;
 }
 .header-mobile nav {
-  padding: 20px 60px;
+  padding: 20px 90px;
 }
 
 /* Desktop */

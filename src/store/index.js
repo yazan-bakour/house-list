@@ -13,9 +13,9 @@ export default createStore({
     housesData: [],
     selectedHouseId: null,
     selectedHouseDetails: null,
-    error: null,
+    status: [],
     visibleModals: [],
-    editButtonClicked: false,
+    editButtonClicked: false
   },
   mutations: {
     setHousesData(state, data) {
@@ -31,8 +31,8 @@ export default createStore({
     setHouseDetails(state, details) {
       state.selectedHouseDetails = details;
     },
-    setPostNewHouseError(state, newError) {
-      state.error = newError
+    setHouseStatus(state, status) {
+      state.status.push(status)
     },
     toggleModal(state, houseId) {
       const index = state.visibleModals.indexOf(houseId);
@@ -45,29 +45,37 @@ export default createStore({
     setEditButtonClicked(state, value) {
       state.editButtonClicked = value;
     },
+    clearHouseStatus(state, index) {
+      state.status.splice(index, 1);
+    },
   },
   actions: {
+    clearHouseStatus({ commit }, index) {
+      commit('clearHouseStatus', index);
+    },
     setEditButtonClicked({ commit }, value) {
       commit('setEditButtonClicked', value);
     },
     toggleModal({ commit }, houseId) {
       commit('toggleModal', houseId);
     },
+
     async fetchHousesData({ commit }) {
       try {
         const response = await api.get('');
         commit('setHousesData', response.data);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        commit('setHouseStatus', { error: error.response.data })
       }
     },
+
     async setSelectedHouseId({ commit }, houseId) {
       try {
         commit('setHouseId', houseId);
         const response = await api.get(`${houseId}`);
         commit('setHouseDetails', response.data);
       } catch (error) {
-        console.error('Error fetching house details:', error);
+        commit('setHouseStatus', { error: error.response.data })
       }
     },
 
@@ -75,17 +83,16 @@ export default createStore({
       try {
         const response = await api.post('', newHouseData);
         dispatch('fetchHousesData');
-        console.log('Response:', response);
-        if (typeof response.data === 'string' || response.data.code) {
-          commit('setPostNewHouseError', response.data.code || response.data)
-        }
+        commit('setHouseStatus', { success: 'House is posted successfully!' })
         return response.data.id;
       } catch (error) {
-        console.error('Error posting new house:', error);
+        if (error.response.data) {
+          commit('setHouseStatus', { error: error.response.data })
+        }
       }
     },
 
-    async uploadImage({ dispatch }, { houseId, image }) {
+    async uploadImage({ dispatch, commit }, { houseId, image }) {
       try {
         const formData = new FormData();
         formData.append('image', image);
@@ -94,33 +101,35 @@ export default createStore({
             'Content-Type': 'multipart/form-data',
           },
         });
-        console.log('Image uploaded successfully:', response.data);
+        commit('setHouseStatus', { success: 'Image uploaded successfully!' });
+        console.log('Image uploaded successfully', response.data);
         dispatch('fetchHousesData');
       } catch (error) {
-        console.error('Error uploading image:', error);
+        commit('setHouseStatus', { error: error.response.data })
       }
     },
 
-    async editHouseById({ dispatch }, { houseId, updatedHouseData }) {
+    async editHouseById({ dispatch, commit }, { houseId, updatedHouseData }) {
       try {
         const response = await api.post(`/${houseId}`, updatedHouseData);
-        console.log('House edited successfully:', response.data);
+        console.log('House edited successfully', response.data);
+        commit('setHouseStatus', { success: 'House edited successfully!' })
         dispatch('fetchHousesData');
       } catch (error) {
-        console.error('Error editing house:', error);
+        commit('setHouseStatus', { error: error.response.data })
       }
     },
 
-    async deleteHouseById({ dispatch }, houseId) {
+    async deleteHouseById({ dispatch, commit }, houseId) {
       try {
         const response = await api.delete(`/${houseId}`);
-        console.log('House deleted successfully:', response.data);
+        console.log('House deleted successfully', response.data);
+        commit('setHouseStatus', { success: 'House deleted successfully!' })
         dispatch('fetchHousesData');
       } catch (error) {
-        console.error('Error deleting house:', error);
+        commit('setHouseStatus', { error: error.response.data })
       }
     },
-
     clearSelectedHouseId({ commit }) {
       commit('clearHouseId');
     },
@@ -129,7 +138,7 @@ export default createStore({
     getHousesData: (state) => state.housesData,
     getSelectedHouseId: (state) => state.selectedHouseId,
     getSelectedHouseDetails: (state) => state.selectedHouseDetails,
-    getPostNewHouseError: (state) => state.error,
+    getHouseStatus: (state) => state.status,
     isVisibleModal: (state) => (houseId) => state.visibleModals.includes(houseId),
     isEditButtonClicked: (state) => state.editButtonClicked,
   },
