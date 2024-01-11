@@ -8,6 +8,7 @@
 
   const createNewLisiting = () => {
     store.commit('clearHouseId');
+    store.dispatch('setEditButtonClicked', false)
     router.push({ name: 'NewLisiting'});
   }
 </script>

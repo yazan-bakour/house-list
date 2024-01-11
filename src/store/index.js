@@ -15,6 +15,7 @@ export default createStore({
     selectedHouseDetails: null,
     error: null,
     visibleModals: [],
+    editButtonClicked: false,
   },
   mutations: {
     setHousesData(state, data) {
@@ -41,8 +42,14 @@ export default createStore({
         state.visibleModals.push(houseId);
       }
     },
+    setEditButtonClicked(state, value) {
+      state.editButtonClicked = value;
+    },
   },
   actions: {
+    setEditButtonClicked({ commit }, value) {
+      commit('setEditButtonClicked', value);
+    },
     toggleModal({ commit }, houseId) {
       commit('toggleModal', houseId);
     },
@@ -124,5 +131,6 @@ export default createStore({
     getSelectedHouseDetails: (state) => state.selectedHouseDetails,
     getPostNewHouseError: (state) => state.error,
     isVisibleModal: (state) => (houseId) => state.visibleModals.includes(houseId),
+    isEditButtonClicked: (state) => state.editButtonClicked,
   },
 });

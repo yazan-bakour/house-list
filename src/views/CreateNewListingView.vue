@@ -1,6 +1,6 @@
 <script setup>
 
-  import { ref, computed, onMounted } from "vue";
+  import { ref, computed, onMounted, watchEffect } from "vue";
   import { useStore } from 'vuex';
   import { useRouter } from 'vue-router';
 // TODO add validation, background Image, and fix image upload and edit api
@@ -13,6 +13,8 @@
   const uploadedFileUrl = ref(null);
 
   const apiError = ref(null)
+  const valid = ref(false)
+  const validationCondition = ref(true)
   
   const streetName = ref("");
   const houseNumber = ref("");
@@ -22,7 +24,7 @@
   const image = ref(null);
   const price = ref("");
   const size = ref("");
-  const hasGarage = ref(false);
+  const hasGarage = ref(null);
   const bedrooms = ref("");
   const bathrooms = ref("");
   const constructionYear = ref("");
@@ -42,6 +44,9 @@
       bathrooms.value = selectedHouseDetails.value.rooms.bathrooms;
       constructionYear.value = selectedHouseDetails.value.constructionYear;
       description.value = selectedHouseDetails.value.description;
+      image.value = selectedHouseDetails.value.image;
+      uploadedFileUrl.value = selectedHouseDetails.value.image;
+      validationCondition.value = false
     }
   });
 
@@ -71,12 +76,51 @@
       })
     }
   }
+  watchEffect(() => {
+    validationCondition.value = !description.value || !image.value || !price.value || !bedrooms.value || !bathrooms.value || !size.value || !streetName.value || !houseNumber.value || !zip.value || !constructionYear.value
+  });
+
+  const handleDisabledClick = () => {
+    if (validationCondition.value) {
+      valid.value = true
+    } else {
+      valid.value = false
+    }
+  }
 
   const submitForm = async () => {
-    if (selectedHouseDetails.value) {
-      await store.dispatch('editHouseById', {
-        houseId: selectedHouseDetails.value.id,
-        updatedHouseData: {
+    if (validationCondition.value) {
+      valid.value = true
+    } else {
+      valid.value = false
+    }
+
+    if (valid.value) {
+      return null
+    } else {
+      if (selectedHouseDetails.value) {
+          await store.dispatch('editHouseById', {
+            houseId: selectedHouseDetails.value.id,
+            updatedHouseData: {
+              price: price.value,
+              bedrooms: bedrooms.value,
+              bathrooms: bathrooms.value,
+              size: size.value,
+              streetName: streetName.value,
+              houseNumber: houseNumber.value,
+              numberAddition: numberAddition.value,
+              zip: zip.value,
+              constructionYear: constructionYear.value,
+              city: city.value,
+              description: description.value,
+              hasGarage: hasGarage.value
+            }
+          });
+          imageUpload(image.value, selectedHouseDetails.value.id)
+          validationCondition.value = false
+          router.push({ name: 'HouseDetails', params: { id: selectedHouseDetails.value.id } });
+      } else {
+        const newHouseData = await store.dispatch('postNewHouse', {
           price: price.value,
           bedrooms: bedrooms.value,
           bathrooms: bathrooms.value,
@@ -89,32 +133,17 @@
           city: city.value,
           description: description.value,
           hasGarage: hasGarage.value
+        });
+        imageUpload(image.value, newHouseData)
+        validationCondition.value = false
+        if (newHouseData) {
+          router.push({ name: 'HouseDetails', params: { id: newHouseData } });
         }
-      });
-      imageUpload(image.value, selectedHouseDetails.value.id)
-      router.push({ name: 'HouseDetails', params: { id: selectedHouseDetails.value.id } });
-    } else {
-      const newHouseData = await store.dispatch('postNewHouse', {
-        price: price.value,
-        bedrooms: bedrooms.value,
-        bathrooms: bathrooms.value,
-        size: size.value,
-        streetName: streetName.value,
-        houseNumber: houseNumber.value,
-        numberAddition: numberAddition.value,
-        zip: zip.value,
-        constructionYear: constructionYear.value,
-        city: city.value,
-        description: description.value,
-        hasGarage: hasGarage.value
-      });
-      imageUpload(image.value, newHouseData)
-      if (newHouseData) {
-        router.push({ name: 'HouseDetails', params: { id: newHouseData } });
       }
-    }
+    } 
     apiError.value = store.getters.getPostNewHouseError;
   };
+  const isEditButtonClicked = store.getters.isEditButtonClicked
 </script>
 
 <template>
@@ -131,78 +160,104 @@
     </div>
 
     <form @submit.prevent="submitForm">
-      <div>
+      <div class="single-field-h">
         <label for="street">Street Name*</label>
-        <input placeholder="Enter the street name" v-model="streetName" id="street" required />
+        <input placeholder="Enter the street name" v-model="streetName" id="street"  />
+        <p class="validation" v-if="valid && !streetName">Require filed missing </p>
       </div>
       <div class="pair">
         <div>
           <label for="houseNumber">House Number*</label>
-          <input placeholder="Enter house number" v-model="houseNumber" id="houseNumber" required />
+          <input placeholder="Enter house number" v-model="houseNumber" id="houseNumber"  />
+          <p class="validation" v-if="valid && !houseNumber">Require filed missing </p>
         </div>
         <div>
           <label for="addition">Addition (optional)</label>
           <input placeholder="e.g A" v-model="numberAddition" id="addition" />
         </div>
       </div>
-      <div>
+      <div class="single-field-h">
         <label for="postalCode">Postal Code*</label>
-        <input placeholder="e.g 1000 AA" v-model="zip" id="postalCode" required />
+        <input placeholder="e.g 1000 AA" v-model="zip" id="postalCode"  />
+        <p class="validation" v-if="valid && !zip">Require filed missing </p>
       </div>
-      <div>
+      <div class="single-field-h">
         <label for="city">City*</label>
-        <input placeholder="e.g Utrecht" v-model="city" id="city" required />
+        <input placeholder="e.g Utrecht" v-model="city" id="city"  />
+        <p class="validation" v-if="valid && !city">Require filed missing </p>
       </div>
-      <div>
+      <div class="large-h">
         <label for="picture">Upload Picture (PNG or JPG)*</label>
         <div class="uploader">
           <input ref="fileInput" type="file" style="display: none" @change="handleFileUpload" accept="image/*" />
           <img :class="uploadedFileUrl ? 'uploaded-image' : 'normal-image'" :src="uploadedFileUrl || require('@/assets/ic_upload@3x.png')" alt="Upload" @click="triggerFileInput" />
         </div>
+        <p class="validation" v-if="valid && !image">Require filed missing </p>
       </div>
-      <div>
+      <div class="single-field-h">
         <label for="price">Price*</label>
-        <input placeholder="e.g €150.000" v-model="price" id="price" required />
+        <input placeholder="e.g €150.000" v-model="price" id="price"  />
+        <p class="validation" v-if="valid && !price">Require filed missing </p>
       </div>
       <div class="pair">
         <div>
           <label for="size">Size*</label>
-          <input placeholder="e.g 60m2" v-model="size" id="size" required />
+          <input placeholder="e.g 60m2" v-model="size" id="size"  />
+          <p class="validation" v-if="valid && !size">Require filed missing </p>
         </div>
-        <div>
+        <div class="garage">
           <label for="garage">Garage*</label>
-          <input type="checkbox" v-model="hasGarage" id="garage" />
+          <select id="garage" v-model="hasGarage">
+            <option disabled :value="null">Select</option>
+            <option :value="true">Yes</option>
+            <option :value="false">No</option>
+          </select>
+          <p class="validation" v-if="valid && hasGarage == null">Require filed missing </p>
         </div>
       </div>
       <div class="pair">
         <div>
           <label for="bedrooms">Bedrooms*</label>
-          <input placeholder="Enter amount" v-model="bedrooms" id="bedrooms" required />
+          <input placeholder="Enter amount" v-model="bedrooms" id="bedrooms"  />
+          <p class="validation" v-if="valid && !bedrooms">Require filed missing </p>
         </div>
         <div>
           <label for="bathrooms">Bathrooms*</label>
-          <input placeholder="Enter amount" v-model="bathrooms" id="bathrooms" required />
+          <input placeholder="Enter amount" v-model="bathrooms" id="bathrooms"  />
+          <p class="validation" v-if="valid && !bathrooms">Require filed missing </p>
         </div>
       </div>
-      <div>
+      <div class="single-field-h">
         <label placeholder="e.g 1990" for="constructionDate">Construction Date*</label>
-        <input
-          placeholder="Enter description"
-          v-model="constructionYear"
-          id="constructionDate"
-          required
-        />
+        <input placeholder="Enter description" v-model="constructionYear" id="constructionDate" />
+        <p class="validation" v-if="valid && !constructionYear">Require filed missing </p>
       </div>
-      <div>
+      <div class="large-h">
         <label for="description">Description*</label>
-        <textarea v-model="description" id="description" required></textarea>
+        <textarea placeholder="Description" v-model="description" id="description" ></textarea>
+        <p class="validation" v-if="valid && !description">Require filed missing </p>
       </div>
-      <button class="cta" type="submit">{{ selectedHouseDetails ? 'Save' : 'Submit' }}</button>
+      <div class="submit-button">
+        <div v-if="validationCondition" class="cta-disabled" @click="handleDisabledClick">{{ (selectedHouseDetails && isEditButtonClicked) ? 'Save' : 'Submit' }}</div>
+        <button v-if="!validationCondition" class="cta" type="submit">{{ (selectedHouseDetails && isEditButtonClicked) ? 'Save' : 'Submit' }}</button>
+      </div>
     </form>
   </div>
 </template>
 
 <style>
+  .single-field-h {
+    height: 95px;
+  }
+  .large-h {
+    height: 155px;
+  }
+  .create-container .validation {
+    margin-top: 10px;
+    color: var(--color-background-primary);
+    font-size: 12px;
+    font-style: italic;
+  }
   .snack-bar {
     position: fixed;
     top: 0;
@@ -278,6 +333,7 @@
   .create-container form {
     max-width: 340px;
     width: 100%;
+    height: 1400px;
     margin-top: 20px;
   }
   .create-container form .pair div:first-child { 
@@ -288,18 +344,31 @@
     flex-direction: row;
     justify-content: space-between;
     margin: 0;
+    height: 135px;
+  }
+  .create-container .pair select {
+    height: 40px;
+    border-radius: 6px;
+    border: 1px solid var(--color-background-tertiary-soft);
+    width: 100%;
+    padding-left: 10px;
+    font-size: 14px;
+    font-family: 'Open Sans', sans-serif;
+  }
+  .create-container .pair .garage {
+    flex: 1
   }
   .create-container form div {
     display: flex;
     flex-direction: column;
-    margin-bottom: 40px;
+    margin-bottom: 20px;
     align-items: start;
   }
   .create-container form div label {
     margin-bottom: 10px;
   }
   .create-container form div input {
-    height: 30px;
+    height: 40px;
     border-radius: 6px;
     border: 1px solid var(--color-background-tertiary-soft);
     width: 100%;
@@ -323,6 +392,22 @@
     color: var(--color-background);
     font-weight: 700;
   }
+  .create-container .cta-disabled {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 0;
+    background-color: var(--color-background-primary);
+    height: 48px;
+    width: 100%;
+    border-radius: 6px;
+    color: var(--color-background);
+    font-weight: 700;
+    opacity: 80%;
+  }
+  .create-container .submit-button {
+    display: flex;
+  }
 
   @media (min-width: 600px) {
     .create-container .heading {
@@ -337,7 +422,12 @@
     }
     .create-container .cta {
       width: 50%;
-      float: right;
+    }
+    .create-container .cta-disabled {
+      width: 50%;
+    }
+    .create-container .submit-button {
+      align-items: end;
     }
   }
 </style>

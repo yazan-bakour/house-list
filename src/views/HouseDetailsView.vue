@@ -39,7 +39,8 @@
 
   const deleteHouse = async (houseId) => {
     await store.dispatch('deleteHouseById', houseId);
-    store.dispatch('toggleModal');
+    store.dispatch('toggleModal', houseId);
+    router.push({ name: 'houses'});
   };
 
   const toggleModal = (houseId) => {
@@ -50,6 +51,7 @@
   const navigateToHouseDetails = async (houseId, route) => {
     await store.dispatch('setSelectedHouseId', houseId);
     selectedHouseDetails.value = store.getters.getSelectedHouseDetails;
+    store.dispatch('setEditButtonClicked', true)
     router.push({ name: route, params: { id: houseId } });
   };
 </script>

@@ -25,7 +25,7 @@
   }
   @media (min-width: 600px) {
     .house-details-main {
-      padding: 20px 0;
+      padding: 50px 0;
     }
   }
   @media (min-width: 1024px) {

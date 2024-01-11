@@ -36,7 +36,7 @@
       return a.price - b.price;
     });
   });
-  // TODO OPTIMIZE THE SORTING LOGIC
+
   const sortingOptions = {
     PRICE: 'price',
     SIZE: 'size',
@@ -65,6 +65,7 @@
   const navigateToHouseDetails = async (houseId, route) => {
     await store.dispatch('setSelectedHouseId', houseId);
     selectedHouseDetails.value = store.getters.getSelectedHouseDetails;
+    store.dispatch('setEditButtonClicked', true)
     router.push({ name: route, params: { id: houseId } });
   };
 
