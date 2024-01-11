@@ -1,17 +1,26 @@
 <script setup>
   import { ref, onMounted, getCurrentInstance } from 'vue';
+  import { useRoute } from 'vue-router'
+
+  const router = useRoute()
+  const instance = getCurrentInstance();
 
   const activeHouseRef = ref('')
 
-  const instance = getCurrentInstance();
-
-  const toggleNav = (route) => {
-    activeHouseRef.value = activeHouseRef.value === route ? '' : route;
-  };
   onMounted(() => {
     const currentRoute = instance.proxy.$route?.name;
     activeHouseRef.value = currentRoute === 'about' ? 'about' : '/';
   });
+
+  const toggleNav = (route) => {
+    activeHouseRef.value = activeHouseRef.value === route ? '' : route;
+  };
+  const isActive = (paths) => {
+    if (router.path === '/about') {
+      return false;
+    }
+    return  paths.some(path => router.path.startsWith(path))
+  }
 </script>
 
 <template>
@@ -19,7 +28,7 @@
     <div class="wrapper">
       <img alt="DTT logo" src="@/assets/img_logo_dtt@3x.png" />
       <nav>
-        <router-link to="/">Houses</router-link>
+        <router-link :to="{ path: '/' }" :class="{ active: isActive(['/', '/details', '/new-listing']) }">Houses</router-link>
         <router-link to="/about">About</router-link>
       </nav>
     </div>
@@ -40,6 +49,9 @@
 </template>
 
 <style>
+.header nav .active {
+  color: var(--color-text-primary);
+}
 .icon {
   width: 29px;
   height: 29px;
@@ -55,7 +67,7 @@
   position: fixed;
   bottom: 0;
   left: 0;
-  background-color: #fff;
+  background-color: var(--color-background);
   box-shadow: rgba(149, 157, 165, 0.2) 0px -6px 7px;
 }
 .header-mobile nav {
@@ -86,12 +98,12 @@
 }
 .header nav a {
   font-weight: bold;
-  color: #C3C3C3;
+  color: var(--color-background-tertiary);
   margin-right: 50px;
   text-decoration: none;
 }
 .header nav .router-link-exact-active {
-  color: #000000;
+  color: var(--color-text-primary);
 }
 @media (min-width: 600px) {
   .header-mobile {

@@ -209,7 +209,7 @@
     right: 0;
     width: 200px;
     height: auto;
-    background-color: #EB5440;
+    background-color: var(--color-background-primary);
   }
   .create-container {
     display: flex;
@@ -224,7 +224,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid #4A4B4C;
+    border: 1px solid var(--color-background-secondary);
     border-style: dashed;
     margin-bottom: 0;
   }
@@ -301,7 +301,7 @@
   .create-container form div input {
     height: 30px;
     border-radius: 6px;
-    border: 1px solid #E8E8E8;
+    border: 1px solid var(--color-background-tertiary-soft);
     width: 100%;
     padding-left: 10px;
     font-size: 14px;
@@ -310,17 +310,17 @@
   .create-container form div textarea {
     height: 100px;
     border-radius: 6px;
-    border: 1px solid #E8E8E8;
+    border: 1px solid var(--color-background-tertiary-soft);
     width: 100%;
     padding: 10px;
   }
   .create-container .cta {
     border: 0;
-    background-color: #EB5440;
+    background-color: var(--color-background-primary);
     height: 48px;
     width: 100%;
     border-radius: 6px;
-    color: #fff;
+    color: var(--color-background);
     font-weight: 700;
   }
 

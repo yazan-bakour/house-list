@@ -25,7 +25,7 @@
   width: 100%;
   margin-left: -180px;
   border: 0;
-  background: #fff;
+  background: var(--color-background);
   max-width: 360px;
   display: flex;
   flex-direction: column;
@@ -65,14 +65,14 @@
   border-radius: 10px;
   padding: 10px;
   text-align: center;
-  color: #fff;
+  color: var(--color-background);
 }
 .modal .buttons .delete {
-  background-color: #EB5440;
+  background-color: var(--color-background-primary);
   margin-bottom: 20px;
 }
 .modal .buttons .cancle {
-  background-color: #4A4B4C;
+  background-color: var(--color-background-secondary);
 }
 @media (min-width: 600px) {
   .modal {

@@ -1,0 +1,89 @@
+:root {
+  --e-c-background: #ffffff;
+  --e-c-background-soft: #F6F6F6;
+
+  --e-c-tertiary: #C3C3C3;
+  --e-c-tertiary-soft: #E8E8E8;
+  
+  --e-c-primary: #EB5440;
+  --e-c-secondary: #4A4B4C;
+
+  --t-c-primary: #000000;
+  --t-c-secondary: #4A4B4C;
+  --t-c-hyperlink: #067BC2;
+}
+
+/* semantic color variables for this project */
+:root {
+  --color-background: var(--e-c-background);
+  --color-background-soft: var(--e-c-background-soft);
+
+  --color-background-tertiary: var(--e-c-tertiary);
+  --color-background-tertiary-soft: var(--e-c-tertiary-soft);
+
+  --color-background-primary: var(--e-c-primary);
+  --color-background-secondary: var(--e-c-secondary);
+
+  --color-text-primary: var(--t-c-primary);
+  --color-text-secondary: var(--t-c-secondary);
+  --color-text-hyperlink: var(--t-c-hyperlink);
+
+  --section-gap: 160px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  font-weight: normal;
+}
+body {
+  font-family: 'Montserrat', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  /* width: 100%; */
+  height: 100%;
+  box-sizing: border-box;
+  margin: 0;
+}
+p {
+  margin: 0;
+}
+label {
+ font-size: 12px;
+}
+h1 {
+ font-size: 18px;
+ font-weight: 600;
+}
+h2 {
+ font-size: 14px;
+}
+button {
+ font-size: 12px;
+ font-weight: 600;
+ cursor: pointer;
+}
+.heading {
+  width: 100%;
+  text-align: center;
+}
+@media (min-width: 600px) {
+  .heading {
+    text-align: left;
+  }
+  button {  
+    font-size: 18px;
+  }
+  h1 {
+    font-size: 32px;
+  }
+  h2 {
+    font-size: 22px;
+  }
+  label {
+    font-size: 14px;
+  }
+}

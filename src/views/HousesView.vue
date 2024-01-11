@@ -14,7 +14,7 @@
 
 <template>
   <div class="heading-container">
-    <h2 class="heading">Houses</h2>
+    <h1 class="heading">Houses</h1>
     <button class="mobile-button-container" @click="createNewLisiting">
       <img
         class="icon-mobile"
@@ -44,11 +44,12 @@
   width: 100%;
   display: flex;
   justify-content: space-between;
+  margin-bottom: 30px;
 }
 .mobile-button-container {
   display: block;
   border: 0;
-  background-color: #fff;
+  background-color: var(--color-background);
 }
 .mobile-button-container .icon-mobile {
   width: 24px;
@@ -65,22 +66,20 @@
   .mobile-button-container {
     display: none;
   }
-  .search-container input {
-    width: 300px;
-  }
   .desktop-button-container {
     width: 180px;
     height: 40px;
     display: flex;
     align-items: center;
-    background-color: #eb5440;
+    background-color: var(--color-background-primary);
     border: 0;
     border-radius: 5px;
-    color: #fff;
+    color: var(--color-background);
     padding: 8px 15px;
   }
   .desktop-button-container p {
     width: 130px;
+    font-weight: 600;
   }
   .desktop-button-container .icon-desktop {
     width: 18px;

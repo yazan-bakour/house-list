@@ -22,4 +22,30 @@
     background-image: url("@/assets/img_background@3x.png");
     background-size: cover;
   }
+  .main {
+    padding-top: 10px;
+  }
+  .body-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 auto;
+    padding: 20px 20px 150px;
+    box-sizing: content-box;
+  }
+  @media (min-width: 600px) {
+    .main {
+      padding-top: 50px;
+    }
+    .body-wrapper {
+      max-width: 780px;
+      align-items: start;
+      padding: 0 20px 150px;
+    }
+  }
+  @media (min-width: 1024px) {
+    .body-wrapper {
+      max-width: 1000px;
+    }
+  }
 </style>

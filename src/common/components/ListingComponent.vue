@@ -20,7 +20,6 @@
   };
 
   const isModalVisible = computed(() => (houseId) => store.getters.isVisibleModal(houseId));
-  
 </script>
 
 <template>
@@ -85,17 +84,13 @@
   border-radius: 5px;
   overflow: hidden;
   cursor: pointer;
-  /* flex-grow: 12; */
-  /* width: 40%; */
 }
 .result-card .image img {
   width: 110px;
-  /* height: 90px; */
   margin: 0;
 }
 .result-card .info {
   flex: 2;
-  /* width: 40%; */
   display: flex;
   flex-direction: column;
   align-items: start;
@@ -139,15 +134,15 @@
 }
 .result-card .info .name {
  font-weight: 700;
- color: #000000;
+ color: var(--color-text-primary);
 }
 .result-card .info .price {
   font-weight: 500;
-  color: #4A4B4C;
+  color: var(--color-background-secondary);
 }
 .result-card .info .address {
   font-weight: 300;
-  color: #C3C3C3;
+  color: var(--color-background-tertiary);
 }
 
 @media (min-width: 480px) {
@@ -175,7 +170,6 @@
     border-radius: 5px;
     height: 180px;
     margin-right: 25px;
-    /* width: 40%; */
   }
   .result-card .info .name {
     font-size: 22px;
