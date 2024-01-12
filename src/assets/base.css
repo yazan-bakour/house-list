@@ -40,6 +40,9 @@
   margin: 0;
   font-weight: normal;
 }
+html {
+  overflow-y: scroll;
+}
 body {
   font-family: 'Montserrat', sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -52,6 +55,9 @@ body {
 }
 p {
   margin: 0;
+}
+a {
+  color: var(--color-text-hyperlink);
 }
 label {
  font-size: 12px;

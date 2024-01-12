@@ -21,12 +21,6 @@
   const handleToast = (index) => {
     store.dispatch('clearHouseStatus', index);
   }
-
-  watch(apiStatus, (newApiStatus) => {
-    console.log('New apiStatus:', newApiStatus);
-  });
-
-  console.log(apiStatus.value)
 </script>
 
 <template>

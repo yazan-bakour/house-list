@@ -6,7 +6,7 @@ import CreateNewListingView from '../views/CreateNewListingView.vue'
 const routes = [
   {
     path: '/',
-    name: 'houses',
+    name: 'overview',
     component: HousesView
   },
   {
@@ -15,7 +15,7 @@ const routes = [
     component: HouseDetailsView
   },
   {
-    path: '/new-listing',
+    path: '/listing',
     name: 'NewLisiting',
     component: CreateNewListingView
   },

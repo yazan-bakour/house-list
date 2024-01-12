@@ -21,7 +21,7 @@
   });
 
   const navigateBackToHouseListing = () => {
-    router.push({ name: 'houses' });
+    router.push({ name: 'overview' });
   }
   
   onMounted(async () => {
@@ -40,7 +40,7 @@
   const deleteHouse = async (houseId) => {
     await store.dispatch('deleteHouseById', houseId);
     store.dispatch('toggleModal', houseId);
-    router.push({ name: 'houses'});
+    router.push({ name: 'overview'});
   };
 
   const toggleModal = (houseId) => {

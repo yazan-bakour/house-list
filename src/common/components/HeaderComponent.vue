@@ -28,7 +28,7 @@
     <div class="wrapper">
       <img alt="DTT logo" src="@/assets/img_logo_dtt@3x.png" />
       <nav>
-        <router-link :to="{ path: '/' }" :class="{ active: isActive(['/', '/details', '/new-listing']) }">Houses</router-link>
+        <router-link :to="{ path: '/' }" :class="{ active: isActive(['/', '/details', '/listing']) }">Houses</router-link>
         <router-link to="/about">About</router-link>
       </nav>
     </div>

@@ -3,6 +3,7 @@
   import { ref, onMounted, computed, watchEffect } from "vue";
   import { useRouter } from 'vue-router';
   import ListingComponent from './ListingComponent.vue'
+  import SkeletonComponent from './SkeletonComponent.vue';
 
   const router = useRouter();
   const store = useStore();
@@ -11,15 +12,21 @@
 
   const currentPage = ref(1);
   const itemsPerPage = 10;
-
+  const isFetching = ref(true);
+  const searchQuery = ref("");
+  
   onMounted(async () => {
+    try {
+      await store.dispatch('fetchHousesData');
+    } finally {
+      isFetching.value = false;
+    }
+
     watchEffect(() => {
       housesData.value = store.getters.getHousesData;
     });
-    await store.dispatch('fetchHousesData');
   });
 
-  const searchQuery = ref("");
 
   const filteredAndSortedHouses = computed(() => {
     const query = searchQuery.value.toLowerCase().trim();
@@ -110,7 +117,11 @@
       </div>
     </div>
 
-    <div v-if="filteredAndSortedHouses.length > 0" class="items-results">
+    <div v-if="isFetching">
+      <SkeletonComponent />
+    </div>
+
+    <div v-else-if="filteredAndSortedHouses.length > 0" class="items-results">
       <ListingComponent :data="paginatedHouses" :navigate="navigateToHouseDetails" />
 
       <div class="pagination">
@@ -218,8 +229,9 @@
 .pagination button {
   border: 0;
   background-color: var(--color-background-tertiary-soft);
-  width: 200px;
-  padding: 8px 0;
+  max-width: 200px;
+  width: 40%;
+  padding: 10px 0;
 }
 .pagination .previous {
   border-top-left-radius: 5px;

@@ -63,7 +63,7 @@
     if (selectedHouseDetails.value) {
       router.push({ name: 'HouseDetails', params: { id: selectedHouseDetails.value.id } });
     } else {
-      router.push({ name: 'houses'});
+      router.push({ name: 'overview'});
     }
   };
 
